@@ -43,7 +43,8 @@ public class TheNCubeModule : MonoBehaviour
     private Material _edgesMat, _verticesMat, _facesMat;
     private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
     private static readonly string[] _rotationNames = new[] { "XY", "YX", "XZ", "ZX", "XW", "WX", "XV", "VX", "YZ", "ZY", "YW", "WY", "YV", "VY", "ZW", "WZ", "ZV", "VZ", "WV", "VW" };
-    private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" } };
+                                                                        // 1                            2                           3                       4                       5                           6                       7                           8
+    private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" }, new[] { "tick", "tock" }, new[] { "click", "clack" }, new[] { "tip", "tap" } };
     private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
     private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
     private static readonly int[] _shapeOrder = { 4, 3, 1, 2, 0 };
@@ -128,9 +129,9 @@ public class TheNCubeModule : MonoBehaviour
         _rotationCoroutine = StartCoroutine(RotateUltracube());
     }
 
-    private Point5D[] GetUnrotatedVertices()
+    private PointND[] GetUnrotatedVertices()
     {
-        return Enumerable.Range(0, 1 << 5).Select(i => new Point5D((i & 1) != 0 ? 1 : -1, (i & 2) != 0 ? 1 : -1, (i & 4) != 0 ? 1 : -1, (i & 8) != 0 ? 1 : -1, (i & 16) != 0 ? 1 : -1)).ToArray();
+        return Enumerable.Range(0, 1 << 5).Select(i => new PointND((i & 1) != 0 ? 1 : -1, (i & 2) != 0 ? 1 : -1, (i & 4) != 0 ? 1 : -1, (i & 8) != 0 ? 1 : -1, (i & 16) != 0 ? 1 : -1)).ToArray();
     }
 
     private KMSelectable.OnInteractHandler VertexClick(int v)

@@ -350,7 +350,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-Uc.csproj">
+    <ProjectReference Include="Assembly-CSharp-nc.csproj">
       <Project>{9D37B682-45AE-775A-82C7-025A85D5B752}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
