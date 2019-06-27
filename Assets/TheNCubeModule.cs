@@ -68,7 +68,7 @@ public class TheNCubeModule : MonoBehaviour
     void Start()
     {
         this._moduleId = _moduleIdCounter++;
-        this.dimensionCount = 6;
+        this.dimensionCount = 9;
 
         // generate shape names
         var predefinedNames = new[] { "vertex", "edge", "face", "cube", "hypercube", "ultracube" };

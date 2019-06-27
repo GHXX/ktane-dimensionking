@@ -416,6 +416,18 @@ Prefab:
       propertyPath: m_Name
       value: TheNCube
       objectReference: {fileID: 0}
+    - target: {fileID: 11429752, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
+      propertyPath: ModuleDisplayName
+      value: The N-Cube
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429752, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
+      propertyPath: ModuleType
+      value: TheNcubeModule
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429752, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
+      propertyPath: RequiresTimerVisibility
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
   m_IsPrefabParent: 0

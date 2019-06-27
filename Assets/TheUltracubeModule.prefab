@@ -252,8 +252,8 @@ MonoBehaviour:
   m_Script: {fileID: -119419473, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModuleType: TheUltracubeModule
-  ModuleDisplayName: The Ultracube
+  ModuleType: TheNcubeModule
+  ModuleDisplayName: The N-Cube
   RequiresTimerVisibility: 0
 --- !u!114 &11464240
 MonoBehaviour:
@@ -1031,7 +1031,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4138533460171966}
   m_Layer: 0
-  m_Name: Ultracube
+  m_Name: TheNCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
