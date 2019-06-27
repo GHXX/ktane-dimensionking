@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 
 namespace TheUltracube
 {
@@ -12,17 +14,56 @@ namespace TheUltracube
         }
 
         private static readonly float wLen = .2f;//1 / Mathf.Sqrt(3);
-        private static readonly Vector3[] nonXyzVectors = new[] { // TODO make N-Capable
-            new Vector3(2 * wLen, 2 * wLen, wLen),
-            new Vector3(wLen, 2 * wLen, 2 * wLen)
-        };
+        //private static readonly Vector3[] nonXyzVectors = new[] { // TODO make N-Capable
+        //    new Vector3(2 * wLen, 2 * wLen, wLen), // W
+        //    new Vector3(wLen, 2 * wLen, 2 * wLen), // V
+        //};
+
+        private static Vector3[] _nonXyzVectors = new Vector3[0];
+
+        private static Vector3[] GetNonXyzVectors(int amount)
+        {
+            if (_nonXyzVectors.Length < amount)
+            {
+                _nonXyzVectors = CoordGenerator(amount);
+            }
+
+            return _nonXyzVectors.Take(amount).ToArray();
+        }
+
+        private Vector3[] NonXyzVectors { get { return GetNonXyzVectors(this.Coordinates.Length - 3); } }
+
+        private static Vector3[] CoordGenerator(int amount)
+        {
+            var retvalue = new Vector3[amount];
+            for (int i = 0; i < amount; i++)
+            {
+                int lengthfactor = i / 6 + 1;
+                int mod3 = i % 3;
+                if (i % 6 > 2)
+                    lengthfactor *= -1;
+
+                switch (mod3)
+                {
+                    case 0:
+                        retvalue[i] = new Vector3(2, 2, 1); break;
+                    case 1:
+                        retvalue[i] = new Vector3(1, 2, 2); break;
+                    case 2:
+                        retvalue[i] = new Vector3(2, 1, 2); break;
+                    default: throw new NotImplementedException();
+                }
+                retvalue[i] *= wLen * lengthfactor;
+            }
+            return retvalue;
+        }
 
         public Vector3 Project()
         {
             var retval = new Vector3((float)this.Coordinates[0], (float)this.Coordinates[1], (float)this.Coordinates[2]);
-            for (int dim = 0; dim < nonXyzVectors.Length; dim++)
+            for (int dim = 0; dim < this.NonXyzVectors.Length; dim++)
             {
-                retval += (float)this.Coordinates[dim + 3] * nonXyzVectors[dim];
+                retval += (float)this.Coordinates[dim + 3] * this.NonXyzVectors[dim];
             }
             return retval;
         }
