@@ -51,6 +51,7 @@ public class TheNCubeModule : MonoBehaviour
     private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
     private int[] _shapeOrder = { 4, 3, 1, 2, 0 };
     private int dimensionCount = -1; // from 6 to 9 (inclusive)
+    private bool hideFaces = true;
 
     private string GetCurrentAxesChars() { return _axesNames.Take(this.dimensionCount).Join(""); }
 
@@ -629,21 +630,24 @@ public class TheNCubeModule : MonoBehaviour
             Destroy(mesh);
         this._generatedMeshes.Clear();
 
-        var f = 0;
-        for (int i = 0; i < 1 << this.dimensionCount; i++)
-            for (int j = i + 1; j < 1 << this.dimensionCount; j++)
-            {
-                var b1 = i ^ j;
-                var b2 = b1 & (b1 - 1);
-                if (b2 != 0 && (b2 & (b2 - 1)) == 0 && (i & b1 & ((i & b1) - 1)) == 0 && (j & b1 & ((j & b1) - 1)) == 0)
+        if (!hideFaces)
+        {
+            var f = 0;
+            for (int i = 0; i < 1 << this.dimensionCount; i++)
+                for (int j = i + 1; j < 1 << this.dimensionCount; j++)
                 {
-                    var mesh = new Mesh { vertices = new[] { vertices[i], vertices[i | j], vertices[i & j], vertices[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
-                    mesh.RecalculateNormals();
-                    this._generatedMeshes.Add(mesh);
-                    this.Faces[f].sharedMesh = mesh;
-                    f++;
+                    var b1 = i ^ j;
+                    var b2 = b1 & (b1 - 1);
+                    if (b2 != 0 && (b2 & (b2 - 1)) == 0 && (i & b1 & ((i & b1) - 1)) == 0 && (j & b1 & ((j & b1) - 1)) == 0)
+                    {
+                        var mesh = new Mesh { vertices = new[] { vertices[i], vertices[i | j], vertices[i & j], vertices[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
+                        mesh.RecalculateNormals();
+                        this._generatedMeshes.Add(mesh);
+                        this.Faces[f].sharedMesh = mesh;
+                        f++;
+                    }
                 }
-            }
+        }
     }
 
 #pragma warning disable 414
