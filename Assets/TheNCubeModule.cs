@@ -418,7 +418,7 @@ public class TheNCubeModule : MonoBehaviour
                 yield return "sendtochaterror Dude, it’s a 5D ultracube, you gotta have 5 dimensions.";
                 yield break;
             }
-            var dimensions = elements.Select(el => _dimensionNames.IndexOf(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
+            var dimensions = elements.Select(el => _dimensionNames.ToList().FindIndex(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
             var invalid = Enumerable.Range(0, 4).SelectMany(i => Enumerable.Range(i + 1, 4 - i).Where(j => dimensions[i] == dimensions[j]).Select(j => new { i, j })).FirstOrDefault();
             if (invalid != null)
             {
@@ -429,7 +429,7 @@ public class TheNCubeModule : MonoBehaviour
             }
             var vertexIx = 0;
             for (int i = 0; i < 5; i++)
-                vertexIx |= _dimensionNames[dimensions[i]].IndexOf(dn => dn.EqualsIgnoreCase(elements[i])) << dimensions[i];
+                vertexIx |= _dimensionNames[dimensions[i]].ToList().FindIndex(dn => dn.EqualsIgnoreCase(elements[i])) << dimensions[i];
             yield return null;
             yield return new[] { this.Vertices[vertexIx] };
         }
