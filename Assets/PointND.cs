@@ -42,20 +42,22 @@ namespace TheUltracube
                 if (i % 12 > 2)
                     lengthfactor *= -1;
 
+                float scale345 = 1.1f;
+
                 switch (mod6)
                 {
                     case 0:
                         retvalue[i] = new Vector3(2, 2, 1); break;
                     case 1:
-                        retvalue[i] = new Vector3(1, 2, 2); break;
+                        retvalue[i] = new Vector3(1, 2, 2) * scale345; break;
                     case 2:
-                        retvalue[i] = new Vector3(2, 1, 2); break;
+                        retvalue[i] = new Vector3(2, 1, 2) * scale345 * scale345; break;
                     case 3:
-                        retvalue[i] = new Vector3(-2, 2, 1); break;
+                        retvalue[i] = new Vector3(-2, 2, 1) * scale345 * scale345 * scale345; break;
                     case 4:
-                        retvalue[i] = new Vector3(-1, 2, 2); break;
+                        retvalue[i] = new Vector3(-1, 2, 2) * scale345 * scale345 * scale345 * scale345; break;
                     case 5:
-                        retvalue[i] = new Vector3(-2, 1, 2); break;
+                        retvalue[i] = new Vector3(-2, 1, 2) * scale345 * scale345 * scale345 * scale345 * scale345; break;
                 }
                 retvalue[i] *= wLen * lengthfactor;
             }

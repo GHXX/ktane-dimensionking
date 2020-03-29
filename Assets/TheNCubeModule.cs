@@ -160,7 +160,7 @@ public class TheNCubeModule : MonoBehaviour
         existingVertices[0].Parent.Children = this.Vertices;
         existingVertices[0].Parent.UpdateChildren();
         existingVertices.Clear();
-        
+
 
 
         // setup edgeCount edges
@@ -168,7 +168,7 @@ public class TheNCubeModule : MonoBehaviour
         for (int i = 0; i < (edgeCount - this.Edges.Count()); i++)
         {
             var newEdge = Instantiate(existingEdges[0]);
-            newEdge.name = "Edge " + (this.Edges.Count()+i + 1);
+            newEdge.name = "Edge " + (this.Edges.Count() + i + 1);
             newEdge.transform.parent = existingEdges[0].transform.parent;
             existingEdges.Add(newEdge);
         }
@@ -180,7 +180,7 @@ public class TheNCubeModule : MonoBehaviour
         for (int i = 0; i < (faceCount - this.Faces.Count()); i++)
         {
             var newFace = Instantiate(existingFaces[0]);
-            newFace.name = "Face " + (this.Faces.Count() +i + 1);
+            newFace.name = "Face " + (this.Faces.Count() + i + 1);
             newFace.transform.parent = existingFaces[0].transform.parent;
             newFace.transform.localScale = existingFaces[0].transform.localScale;
             newFace.transform.position = existingFaces[0].transform.position;
@@ -437,7 +437,7 @@ public class TheNCubeModule : MonoBehaviour
     }
     private string StringifyShape(int vertex)
     {
-        return StringifyShape(Enumerable.Range(0, 5).Select(d => (bool?)((vertex & (1 << d)) != 0)).ToArray());
+        return StringifyShape(Enumerable.Range(0, this.dimensionCount).Select(d => (bool?)((vertex & (1 << d)) != 0)).ToArray());
     }
 
     private IEnumerator ColorChange(bool keepGrey = false, bool setVertexColors = false, bool delay = false)
@@ -478,7 +478,7 @@ public class TheNCubeModule : MonoBehaviour
             var desiredFace = this._faces[this._rotations[this._progress]];
             var initialColors = Enumerable.Range(0, 4).ToList();
             var q = new Queue<int>();
-            var colors = new int?[1 << 5];
+            var colors = new int?[1 << this.dimensionCount];
 
             Debug.LogFormat(@"[The NCube #{0}] Stage {1} correct face: {2}", this._moduleId, this._progress + 1, StringifyShape(desiredFace));
             Debug.LogFormat(@"[The NCube #{0}] Stage {1} correct color: {2}", this._moduleId, this._progress + 1, _colorNames[this._colorPermutations[this._rotations[4]][this._progress]]);
@@ -491,7 +491,7 @@ public class TheNCubeModule : MonoBehaviour
                     var ix = Rnd.Range(0, initialColors.Count);
                     colors[v] = initialColors[ix];
                     initialColors.RemoveAt(ix);
-                    for (var d = 0; d < 5; d++)
+                    for (var d = 0; d < this.dimensionCount; d++)
                         q.Enqueue(v ^ (1 << d));
 
                     if (colors[v].Value == this._colorPermutations[this._rotations[4]][this._progress])
@@ -630,7 +630,7 @@ public class TheNCubeModule : MonoBehaviour
             Destroy(mesh);
         this._generatedMeshes.Clear();
 
-        if (!hideFaces)
+        if (!this.hideFaces)
         {
             var f = 0;
             for (int i = 0; i < 1 << this.dimensionCount; i++)
