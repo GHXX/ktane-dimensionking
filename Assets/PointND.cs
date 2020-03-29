@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace TheUltracube
@@ -39,11 +38,11 @@ namespace TheUltracube
             for (int i = 0; i < amount; i++)
             {
                 int lengthfactor = i / 6 + 1;
-                int mod3 = i % 3;
-                if (i % 6 > 2)
+                int mod6 = i % 6;
+                if (i % 12 > 2)
                     lengthfactor *= -1;
 
-                switch (mod3)
+                switch (mod6)
                 {
                     case 0:
                         retvalue[i] = new Vector3(2, 2, 1); break;
@@ -51,7 +50,12 @@ namespace TheUltracube
                         retvalue[i] = new Vector3(1, 2, 2); break;
                     case 2:
                         retvalue[i] = new Vector3(2, 1, 2); break;
-                    default: throw new NotImplementedException();
+                    case 3:
+                        retvalue[i] = new Vector3(-2, 2, 1); break;
+                    case 4:
+                        retvalue[i] = new Vector3(-1, 2, 2); break;
+                    case 5:
+                        retvalue[i] = new Vector3(-2, 1, 2); break;
                 }
                 retvalue[i] *= wLen * lengthfactor;
             }

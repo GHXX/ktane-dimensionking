@@ -45,8 +45,8 @@ public class TheNCubeModule : MonoBehaviour
     private Material _edgesMat, _verticesMat, _facesMat;
     private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
     private static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
-    // dimension number:                                                     1                            2                           3                       4                       5                           6                       7                           8                     9
-    private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" }, new[] { "tick", "tock" }, new[] { "click", "clack" }, new[] { "tip", "tap" }, new[] { "this", "that" } };
+    // dimension number:                                                     1                            2                           3                       4                       5                           6                       7                           8                     9                           10
+    private static readonly string[][] _dimensionNames = new[] { new[] { "left", "right" }, new[] { "bottom", "top" }, new[] { "front", "back" }, new[] { "zig", "zag" }, new[] { "ping", "pong" }, new[] { "tick", "tock" }, new[] { "click", "clack" }, new[] { "tip", "tap" }, new[] { "this", "that" }, new[] { "ying", "yang" } };
     private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
     private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
     private int[] _shapeOrder = { 4, 3, 1, 2, 0 };
