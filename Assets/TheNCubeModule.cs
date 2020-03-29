@@ -440,7 +440,7 @@ public class TheNCubeModule : MonoBehaviour
         return StringifyShape(Enumerable.Range(0, this.dimensionCount).Select(d => (bool?)((vertex & (1 << d)) != 0)).ToArray());
     }
 
-    private IEnumerator ColorChange(bool keepGrey = false, bool setVertexColors = false, bool delay = false)
+    private IEnumerator ColorChange(bool keepGrey = false, bool setVertexColors = false, bool delay = false, bool skipGrey = false)
     {
         this._transitioning = true;
         for (int i = 0; i < this.Vertices.Length; i++)
@@ -449,7 +449,14 @@ public class TheNCubeModule : MonoBehaviour
         var prevHue = .5f;
         var prevSat = 0f;
         var prevV = .5f;
-        SetColor(prevHue, prevSat, prevV);
+        if (skipGrey)
+        {
+            Color.RGBToHSV(_edgesMat.color, out prevHue, out prevSat, out prevV);
+        }
+        else
+        {
+            SetColor(prevHue, prevSat, prevV);
+        }
 
         if (keepGrey)
             yield break;
@@ -479,7 +486,7 @@ public class TheNCubeModule : MonoBehaviour
             var initialColors = Enumerable.Range(0, 4).ToList();
             var q = new Queue<int>();
             var colors = new int?[1 << this.dimensionCount];
-
+            // TODO are all vertices clickable?
             Debug.LogFormat(@"[The NCube #{0}] Stage {1} correct face: {2}", this._moduleId, this._progress + 1, StringifyShape(desiredFace));
             Debug.LogFormat(@"[The NCube #{0}] Stage {1} correct color: {2}", this._moduleId, this._progress + 1, _colorNames[this._colorPermutations[this._rotations[4]][this._progress]]);
 
@@ -492,7 +499,7 @@ public class TheNCubeModule : MonoBehaviour
                     colors[v] = initialColors[ix];
                     initialColors.RemoveAt(ix);
                     for (var d = 0; d < this.dimensionCount; d++)
-                        q.Enqueue(v ^ (1 << d));
+                        q.Enqueue(v ^ (1 << d)); // TODO this overflows badly!
 
                     if (colors[v].Value == this._colorPermutations[this._rotations[4]][this._progress])
                     {
@@ -591,6 +598,11 @@ public class TheNCubeModule : MonoBehaviour
                 SetNCube(unrotatedVertices.Select(v => v.Project()).ToArray());
                 yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
             }
+
+
+            var colorChange2 = ColorChange(delay: false, skipGrey: true);
+            while (colorChange2.MoveNext())
+                yield return colorChange2.Current;
         }
 
         this._transitioning = false;
