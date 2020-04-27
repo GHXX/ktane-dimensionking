@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-namespace TheUltracube
+namespace TheNCube
 {
     struct PointND
     {

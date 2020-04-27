@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using TheUltracube;
+using TheNCube;
 using UnityEngine;
 
 using Rnd = UnityEngine.Random;
 
 /// <summary>
-/// On the Subject of The Ultracube
-/// Created by Timwi
+/// On the Subject of The NCube
+/// Based on the Hyper and Ultracube created by Timwi
 /// </summary>
 public class TheNCubeModule : MonoBehaviour
 {
@@ -45,7 +45,7 @@ public class TheNCubeModule : MonoBehaviour
     private Material _edgesMat, _verticesMat, _facesMat;
     private readonly List<Mesh> _generatedMeshes = new List<Mesh>();
     private static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
-    
+
     private static readonly string[][] _dimensionNames = new[] { 
                                     // dim|Axis
         new[] { "left", "right" },  // 1 = X
@@ -318,7 +318,7 @@ public class TheNCubeModule : MonoBehaviour
         {
             var newForloopvars = new int[forloopvars.Length + 1];
             Array.Copy(forloopvars, newForloopvars, forloopvars.Length);
-            int statvalue = forloopvars.Length == 0 ? 0 : forloopvars[forloopvars.Length - 1] + 1;
+            int statvalue = forloopvars.Length == 0 ? 0 : (forloopvars[forloopvars.Length - 1] + 1);
             for (int i = statvalue; i < this.dimensionCount; i++)
             {
                 newForloopvars[forloopvars.Length] = i;
@@ -408,7 +408,7 @@ public class TheNCubeModule : MonoBehaviour
                 this._progress++;
                 if (this._progress == 4)
                 {
-                    Debug.LogFormat(@"[The Ultracube #{0}] Module solved.", this._moduleId);
+                    Debug.LogFormat(@"[The NCube #{0}] Module solved.", this._moduleId);
                     this.Module.HandlePass();
                     StartCoroutine(ColorChange(keepGrey: true));
                     this.Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, this.transform);
@@ -420,7 +420,7 @@ public class TheNCubeModule : MonoBehaviour
             }
             else
             {
-                Debug.LogFormat(@"[The Ultracube #{0}] Incorrect vertex {1} pressed; resuming rotations.", this._moduleId, StringifyShape(v));
+                Debug.LogFormat(@"[The NCube #{0}] Incorrect vertex {1} pressed; resuming rotations.", this._moduleId, StringifyShape(v));
                 this.Module.HandleStrike();
                 this._rotationCoroutine = StartCoroutine(RotateUltracube(delay: true));
             }
@@ -463,7 +463,7 @@ public class TheNCubeModule : MonoBehaviour
         var prevV = .5f;
         if (skipGrey)
         {
-            Color.RGBToHSV(_edgesMat.color, out prevHue, out prevSat, out prevV);
+            Color.RGBToHSV(this._edgesMat.color, out prevHue, out prevSat, out prevV);
         }
         else
         {
@@ -511,12 +511,12 @@ public class TheNCubeModule : MonoBehaviour
                     colors[v] = initialColors[ix];
                     initialColors.RemoveAt(ix);
                     for (var d = 0; d < this.dimensionCount; d++)
-                        q.Enqueue(v ^ (1 << d)); // TODO this overflows badly!
+                        q.Enqueue(v ^ (1 << d));
 
                     if (colors[v].Value == this._colorPermutations[this._rotations[4]][this._progress])
                     {
                         this._correctVertex = v;
-                        Debug.LogFormat(@"[The Ultracube #{0}] Stage {1} correct vertex: {2}", this._moduleId, this._progress + 1, StringifyShape(this._correctVertex));
+                        Debug.LogFormat(@"[The NCube #{0}] Stage {1} correct vertex: {2}", this._moduleId, this._progress + 1, StringifyShape(this._correctVertex));
                     }
                 }
             }
@@ -538,16 +538,44 @@ public class TheNCubeModule : MonoBehaviour
 
                 var cs = Enumerable.Range(0, 4).ToArray();
                 Array.Sort(numClashesPerColor, cs);
-                colors[vx] = cs[0];
+
+                int[] csCanditates = new int[4];
+                int len = 1;
+                csCanditates[0] = cs[0];
+
+                for (int i = 1; i < 4; i++)
+                {
+                    if (cs[i] == cs[0])
+                    {
+                        csCanditates[i] = cs[i];
+                        len++;
+                    }
+                }
+                if (len == 1)
+                    colors[vx] = cs[0];
+                else
+                    colors[vx] = cs[Rnd.Range(0, len)];
 
                 cs = Enumerable.Range(0, this.dimensionCount).ToArray().Shuffle();
                 for (var d = 0; d < this.dimensionCount; d++)
                     q.Enqueue(vx ^ (1 << cs[d]));
             }
-
+            int unassigned = colors.Count(x => x.Value == 0);
+            int cnt = colors.Length;
             this._vertexColors = colors.Select(v => v.Value).ToArray();
             for (int v = 0; v < 1 << this.dimensionCount; v++)
-                this.Vertices[v].GetComponent<MeshRenderer>().material.color = _vertexColorValues[this._vertexColors[v]];
+            {
+                var c = _vertexColorValues[this._vertexColors[v]];
+                c.a = 0.2f;
+                this.Vertices[v].GetComponent<MeshRenderer>().material.color = c;
+            }
+        }
+
+        var ec = this.Edges[0].GetComponent<MeshRenderer>().material.color;
+        ec.a = 0f;
+        for (int e = 0; e < this.Edges.Length; e++)
+        {
+            this.Edges[e].GetComponent<MeshRenderer>().material.color = ec;
         }
 
         this._transitioning = false;
@@ -675,7 +703,7 @@ public class TheNCubeModule : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ultracube is not rotating]";
+    private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ncube is not rotating]";
 #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
