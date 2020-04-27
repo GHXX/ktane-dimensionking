@@ -258,6 +258,8 @@ public class TheNCubeModule : MonoBehaviour
         //            }
         //        }
 
+        var res = _faces.Select(a => string.Join(" ", a.Select(x => x.HasValue ? x.ToString() : "null").ToArray())).ToArray();
+        var resStr = string.Join("\n", res);
 
         rnd.ShuffleFisherYates(this._faces);
 
@@ -306,82 +308,50 @@ public class TheNCubeModule : MonoBehaviour
         this._rotationCoroutine = StartCoroutine(RotateUltracube());
     }
 
-    private void SetupFacesRecursively(MonoRandom rnd, int depth = 1, params int[] forloopvars) // forloopvars contains the variables i j k... of the recursive forloops
+    private void SetupFacesRecursively(MonoRandom rnd, int depth = 1, params int[] forloopvars) // forloopvars contains the variables dimSkip,a,b,c... of the recursive forloops
     {
         if (depth == 1)
         {
             this._faces = new List<bool?[]>();
-        }
 
-
-        if (depth < this.dimensionCount - 1)
-        {
-            var newForloopvars = new int[forloopvars.Length + 1];
-            Array.Copy(forloopvars, newForloopvars, forloopvars.Length);
-            int statvalue = forloopvars.Length == 0 ? 0 : (forloopvars[forloopvars.Length - 1] + 1);
-            for (int i = statvalue; i < this.dimensionCount; i++)
+            for (int dimskip = 0; dimskip < this.dimensionCount; dimskip++)
             {
+                var newForloopvars = new int[] { dimskip };
+                SetupFacesRecursively(rnd, depth + 1, newForloopvars);
+            }
+        }
+        else if (depth < this.dimensionCount)
+        {
+            for (int i = 0; i < 2; i++) // loop true, false
+            {
+                var newForloopvars = new int[forloopvars.Length + 1];
+                Array.Copy(forloopvars, newForloopvars, forloopvars.Length);
                 newForloopvars[forloopvars.Length] = i;
                 SetupFacesRecursively(rnd, depth + 1, newForloopvars);
             }
         }
         else
         {
-            var faceData = new bool?[this.dimensionCount];
-            var faceData2 = new bool?[this.dimensionCount];
+            var dimskip = forloopvars[0]; // this and the next dimension are set to null
 
-            for (int i = 0; i < this.dimensionCount; i++)
+            // var axesTrueFalse = forloopvars[1,2,3,4, ...]
+            var arr = new bool?[this.dimensionCount];
+
+
+            for (int valueIndex = 0; valueIndex < this.dimensionCount; valueIndex++)
             {
-                faceData[i] = null;
-                faceData2[i] = null;
-            }
-
-            var randomVars = new bool[this.dimensionCount - 3].Select(x => rnd.Next(0, 2) != 0).ToArray();
-            var truefalseIndex = rnd.Next(0, this.dimensionCount - 2);
-            int rngUseIndex = 0;
-
-            for (int d = 0; d < this.dimensionCount; d++)
-            {
-                for (int forloopvarsindex = 0; forloopvarsindex < forloopvars.Length; forloopvarsindex++)
+                int actualindex = (valueIndex + dimskip) % arr.Length;
+                if (valueIndex < 2) // if 0 or 1 set it to null
                 {
-                    var flvNumber = forloopvars[forloopvarsindex];
-                    if (this._shapeOrder[flvNumber] == d)
-                    {
-                        if (d == 0)
-                        {
-                            faceData[d] = true;
-                            faceData2[d] = false;
-                        }
-                        else
-                        {
-                            faceData[d] = randomVars[0];
-                            faceData2[d] = randomVars[0];
-                        }
-                        //if (truefalseIndex == d)
-                        //{
-                        //    faceData[d] = true;
-                        //    faceData2[d] = false;
-
-                        //    forloopvarsindex = forloopvars.Length; // break
-                        //}
-                        //else
-                        //{
-                        //    int rngIndex = rngUseIndex;
-                        //    if (truefalseIndex < rngIndex)
-                        //    {
-                        //        rngIndex--;
-                        //    }
-
-                        //    faceData[d] = faceData2[d] = randomVars[rngIndex];
-                        //    rngUseIndex++;
-                        //    forloopvarsindex = forloopvars.Length; // break
-                        //}
-                    }
+                    arr[actualindex] = null;
+                }
+                else // else, grab the values for the x y z ... axes
+                {
+                    arr[actualindex] = forloopvars[valueIndex - 1] == 1;  // and if its 1 then set it to true, otherwise false
                 }
             }
 
-            this._faces.Add(faceData);
-            this._faces.Add(faceData2);
+            this._faces.Add(arr);
         }
     }
 
