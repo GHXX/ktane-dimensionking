@@ -258,7 +258,7 @@ public class TheNCubeModule : MonoBehaviour
         //            }
         //        }
 
-        var res = _faces.Select(a => string.Join(" ", a.Select(x => x.HasValue ? x.ToString() : "null").ToArray())).ToArray();
+        var res = this._faces.Select(a => string.Join(" ", a.Select(x => x.HasValue ? x.ToString() : "null").ToArray())).ToArray();
         var resStr = string.Join("\n", res);
 
         rnd.ShuffleFisherYates(this._faces);
@@ -509,29 +509,30 @@ public class TheNCubeModule : MonoBehaviour
                 var cs = Enumerable.Range(0, 4).ToArray();
                 Array.Sort(numClashesPerColor, cs);
 
-                int[] csCanditates = new int[4];
-                int len = 1;
-                csCanditates[0] = cs[0];
+                //int[] csCanditates = new int[4];
+                //int len = 1;
+                //csCanditates[0] = cs[0];
 
-                for (int i = 1; i < 4; i++)
-                {
-                    if (cs[i] == cs[0])
-                    {
-                        csCanditates[i] = cs[i];
-                        len++;
-                    }
-                }
-                if (len == 1)
-                    colors[vx] = cs[0];
-                else
-                    colors[vx] = cs[Rnd.Range(0, len)];
-
+                //for (int i = 1; i < 4; i++)
+                //{
+                //    if (cs[i] == cs[0])
+                //    {
+                //        csCanditates[i] = cs[i];
+                //        len++;
+                //    }
+                //}
+                //if (len == 1)
+                //    colors[vx] = cs[0];
+                //else
+                //    colors[vx] = cs[Rnd.Range(0, len)];
+                colors[vx] = cs.PickRandom(); // TODO make the best assignment thing work again
                 cs = Enumerable.Range(0, this.dimensionCount).ToArray().Shuffle();
                 for (var d = 0; d < this.dimensionCount; d++)
                     q.Enqueue(vx ^ (1 << cs[d]));
             }
             int unassigned = colors.Count(x => x.Value == 0);
             int cnt = colors.Length;
+            double pct = unassigned * 100d / cnt;
             this._vertexColors = colors.Select(v => v.Value).ToArray();
             for (int v = 0; v < 1 << this.dimensionCount; v++)
             {
@@ -549,6 +550,70 @@ public class TheNCubeModule : MonoBehaviour
         }
 
         this._transitioning = false;
+    }
+
+    private bool?[] selectedVertex = null;
+    private void UpdateVertexVisibility()
+    {
+        if (this.selectedVertex == null)
+        {
+            for (int v = 0; v < 1 << this.dimensionCount; v++)
+            {
+                var c = _vertexColorValues[this._vertexColors[v]];
+                c.a = 1f;
+                this.Vertices[v].GetComponent<MeshRenderer>().material.color = c;
+            }
+        }
+        else
+        {            
+            for (int v = 0; v < 1 << this.dimensionCount; v++)
+            {
+                var c = _vertexColorValues[this._vertexColors[v]];
+                
+                c.a = GetDistanceBetweenVertices(selectedVertex, selectedVertex);
+                this.Vertices[v].GetComponent<MeshRenderer>().material.color = c;
+            }
+        }
+    }
+
+    private int GetDistanceBetweenVertices(bool?[] vertex1, bool?[] vertex2)
+    {
+        if (vertex1.Length != vertex2.Length)
+            throw new ArgumentException("vertex 1 and vertex 2 got a different number of dimensions!");
+
+        int cnt = 0;
+        for (int i = 0; i < vertex1.Length; i++)
+        {
+            if (!vertex1[i].HasValue)
+                throw new ArgumentNullException("An axis of vertex1 was null!");
+
+            if (!vertex2[i].HasValue)
+                throw new ArgumentNullException("An axis of vertex2 was null!");
+
+            if (vertex1[i].Value != vertex2[i].Value)
+                cnt++;
+        }
+        return cnt;
+    }
+
+    private List<bool?[]> GetNeighbourVertices(bool?[] vertex)
+    {
+        if (vertex.Any(x => !x.HasValue))
+        {
+            throw new ArgumentNullException("A vertex that was passed had null instead of true or false.");
+        }
+
+        var retVal = new List<bool?[]>();
+        for (int i = 0; i < this.dimensionCount; i++)
+        {
+            var copy = new bool?[vertex.Length];
+            Array.Copy(vertex, 0, copy, 0, vertex.Length);
+            copy[i] = !copy[i].Value;
+
+            retVal.Add(copy);
+        }
+
+        return retVal;
     }
 
     private void PlayRandomSound()
