@@ -437,6 +437,14 @@ Prefab:
       propertyPath: m_ReceiveShadows
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 11489182, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
+      propertyPath: TransparentVertexShader
+      value: 
+      objectReference: {fileID: 10770, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 11489182, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
+      propertyPath: DiffuseVertexShader
+      value: 
+      objectReference: {fileID: 4800000, guid: 3f0d4a2e325f9c24f8251b7b8534a096, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
   m_IsPrefabParent: 0

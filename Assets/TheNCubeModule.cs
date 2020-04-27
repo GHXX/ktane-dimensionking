@@ -25,6 +25,11 @@ public class TheNCubeModule : MonoBehaviour
     public Mesh Quad;
     public Material FaceMaterial;
 
+    public Shader DiffuseVertexShader; // KT/Mobile/DiffuseTint
+    public Shader TransparentVertexShader; // KT/Transparent/Mobile Diffuse Underlay200
+
+    private VertexSelectableNDCompound[] translationCompounds = new VertexSelectableNDCompound[0];
+
     // Rule-seed
     private int[][] _colorPermutations;
     private List<bool?[]> _faces;
@@ -214,7 +219,9 @@ public class TheNCubeModule : MonoBehaviour
         for (int i = 0; i < this.Faces.Length; i++)
             this.Faces[i].GetComponent<MeshRenderer>().sharedMaterial = this._facesMat;
 
-        SetNCube(GetUnrotatedVertices().Select(p => p.Project()).ToArray());
+        SetNCube(GetUnrotatedVertices());
+
+
 
         // RULE SEED
         var rnd = this.RuleSeedable.GetRNG();
@@ -233,7 +240,7 @@ public class TheNCubeModule : MonoBehaviour
             this._shapeOrder = tmpShapeOrder;
         }
 
-        SetupFacesRecursively(rnd); // TODO fix that code which seems to be responsible for picking faces which need to be clicked later on.
+        SetupFacesRecursively(rnd);
 
         //for (var i = 0; i < _shapeOrder.Length; i++)
         //    for (var j = i + 1; j < _shapeOrder.Length; j++)
@@ -373,8 +380,13 @@ public class TheNCubeModule : MonoBehaviour
                 this._progress = 0;
                 StartCoroutine(ColorChange(setVertexColors: true));
             }
+            else if (this.Vertices[v] != this.selectedVertexSelectable)
+            {
+                SetAndUpdateVertexVisibility(this.Vertices[v]);
+            }
             else if (v == this._correctVertex)
             {
+                SetAndUpdateVertexVisibility(null);
                 this._progress++;
                 if (this._progress == 4)
                 {
@@ -553,6 +565,26 @@ public class TheNCubeModule : MonoBehaviour
     }
 
     private bool?[] selectedVertex = null;
+    private KMSelectable selectedVertexSelectable = null;
+
+    private void SetAndUpdateVertexVisibility(KMSelectable newVertexSelection)
+    {
+        if (newVertexSelection == null)
+        {
+            this.selectedVertex = null;
+            this.selectedVertexSelectable = null;
+        }
+        else
+        {
+            var vertexCompound = this.translationCompounds.First(x => x.selectable == newVertexSelection);
+
+            this.selectedVertexSelectable = newVertexSelection;
+            this.selectedVertex = vertexCompound.vectorN.Coordinates.Select(x => (bool?)(x > 0)).ToArray();
+        }
+
+        UpdateVertexVisibility();
+    }
+
     private void UpdateVertexVisibility()
     {
         if (this.selectedVertex == null)
@@ -561,17 +593,23 @@ public class TheNCubeModule : MonoBehaviour
             {
                 var c = _vertexColorValues[this._vertexColors[v]];
                 c.a = 1f;
-                this.Vertices[v].GetComponent<MeshRenderer>().material.color = c;
+                var mat = this.Vertices[v].GetComponent<MeshRenderer>().material;
+                mat.color = c;
+                mat.shader = this.DiffuseVertexShader;
             }
         }
         else
-        {            
+        {
+            double alphaMultiplicator = 0.5d;
             for (int v = 0; v < 1 << this.dimensionCount; v++)
             {
                 var c = _vertexColorValues[this._vertexColors[v]];
-                
-                c.a = GetDistanceBetweenVertices(selectedVertex, selectedVertex);
-                this.Vertices[v].GetComponent<MeshRenderer>().material.color = c;
+                var currentVertex = this.translationCompounds.First(x => x.selectable == this.Vertices[v]).vectorN.Coordinates.Select(x => (bool?)(x > 0)).ToArray();
+
+                c.a = (float)Math.Pow(alphaMultiplicator, GetDistanceBetweenVertices(this.selectedVertex, currentVertex));
+                var mat = this.Vertices[v].GetComponent<MeshRenderer>().material;
+                mat.color = c;
+                mat.shader = this.TransparentVertexShader;
             }
         }
     }
@@ -637,7 +675,7 @@ public class TheNCubeModule : MonoBehaviour
             yield return colorChange.Current;
 
         var unrotatedVertices = GetUnrotatedVertices();
-        SetNCube(unrotatedVertices.Select(v => v.Project()).ToArray());
+        SetNCube(unrotatedVertices);
 
         while (!this._transitioning)
         {
@@ -663,14 +701,14 @@ public class TheNCubeModule : MonoBehaviour
                                 i == axis2 && j == axis2 ? Mathf.Cos(angle) :
                                 i == j ? 1 : 0;
 
-                    SetNCube(unrotatedVertices.Select(v => (v * matrix).Project()).ToArray());
+                    SetNCube(unrotatedVertices.Select(v => (v * matrix)).ToArray());
 
                     yield return null;
                     elapsed += Time.deltaTime;
                 }
 
                 // Reset the position of the NCube
-                SetNCube(unrotatedVertices.Select(v => v.Project()).ToArray());
+                SetNCube(unrotatedVertices);
                 yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
             }
 
@@ -694,11 +732,28 @@ public class TheNCubeModule : MonoBehaviour
         return -change / 2 * (t * (t - 2) - 1) + start;
     }
 
-    private void SetNCube(Vector3[] vertices)
+    private void SetNCube(PointND[] verticesNd)
     {
+        bool overwrite = false;
+        if (verticesNd.Length != this.translationCompounds.Length)
+        {
+            overwrite = true;
+        }
+        var newTransCompounds = new List<VertexSelectableNDCompound>();
+        var vertices3d = verticesNd.Select(x => x.Project()).ToArray();
+
         // VERTICES
         for (int i = 0; i < 1 << this.dimensionCount; i++)
-            this.Vertices[i].transform.localPosition = vertices[i];
+        {
+            if (overwrite)
+            {
+                newTransCompounds.Add(new VertexSelectableNDCompound(this.Vertices[i], verticesNd[i]));
+            }
+            this.Vertices[i].transform.localPosition = vertices3d[i];
+        }
+
+        if (overwrite)
+            this.translationCompounds = newTransCompounds.ToArray();
 
         // EDGES
         var e = 0;
@@ -706,9 +761,9 @@ public class TheNCubeModule : MonoBehaviour
             for (int j = i + 1; j < 1 << this.dimensionCount; j++)
                 if (((i ^ j) & ((i ^ j) - 1)) == 0)
                 {
-                    this.Edges[e].localPosition = (vertices[i] + vertices[j]) / 2;
-                    this.Edges[e].localRotation = Quaternion.FromToRotation(Vector3.up, vertices[j] - vertices[i]);
-                    this.Edges[e].localScale = new Vector3(.1f, (vertices[j] - vertices[i]).magnitude / 2, .1f);
+                    this.Edges[e].localPosition = (vertices3d[i] + vertices3d[j]) / 2;
+                    this.Edges[e].localRotation = Quaternion.FromToRotation(Vector3.up, vertices3d[j] - vertices3d[i]);
+                    this.Edges[e].localScale = new Vector3(.1f, (vertices3d[j] - vertices3d[i]).magnitude / 2, .1f);
                     e++;
                 }
 
@@ -727,7 +782,7 @@ public class TheNCubeModule : MonoBehaviour
                     var b2 = b1 & (b1 - 1);
                     if (b2 != 0 && (b2 & (b2 - 1)) == 0 && (i & b1 & ((i & b1) - 1)) == 0 && (j & b1 & ((j & b1) - 1)) == 0)
                     {
-                        var mesh = new Mesh { vertices = new[] { vertices[i], vertices[i | j], vertices[i & j], vertices[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
+                        var mesh = new Mesh { vertices = new[] { vertices3d[i], vertices3d[i | j], vertices3d[i & j], vertices3d[j] }, triangles = new[] { 0, 1, 2, 1, 2, 3, 2, 1, 0, 3, 2, 1 } };
                         mesh.RecalculateNormals();
                         this._generatedMeshes.Add(mesh);
                         this.Faces[f].sharedMesh = mesh;

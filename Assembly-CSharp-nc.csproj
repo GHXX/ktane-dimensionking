@@ -80,6 +80,7 @@
     <Compile Include="Assets\TestHarness\Widgets\TwoFactorWidget.cs" />
     <Compile Include="Assets\TestHarness\Widgets\Widget.cs" />
     <Compile Include="Assets\TheNCubeModule.cs" />
+    <Compile Include="Assets\VertexSelectableNDCompound.cs" />
     <None Include="Assets\Shaders\KT_3D_Text-Diffuse.shader" />
     <None Include="Assets\Shaders\BlendTwoTexturesUnlit.shader" />
     <None Include="Assets\Shaders\BlendTwoTexturesLitAndUnlitVertexColor.shader" />
