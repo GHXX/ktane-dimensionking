@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\GeoObject.cs" />
     <Compile Include="Assets\KMScripts\GeneralExtensions.cs" />
     <Compile Include="Assets\KMScripts\KMBombInfoExtensions.cs" />
     <Compile Include="Assets\KMScripts\KMBossModule.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Assets\KMScripts\PrivateWhenPlayingAttribute.cs" />
     <Compile Include="Assets\KMScripts\ReadOnlyWhenPlayingAttribute.cs" />
     <Compile Include="Assets\PointND.cs" />
+    <Compile Include="Assets\SchlafliInterpreter.cs" />
     <Compile Include="Assets\TestHarness\EdgeworkConfiguration.cs" />
     <Compile Include="Assets\TestHarness\NeedyTimer.cs" />
     <Compile Include="Assets\TestHarness\SevenSegDisplay.cs" />
