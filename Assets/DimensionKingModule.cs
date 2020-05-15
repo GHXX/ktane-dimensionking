@@ -12,7 +12,7 @@ using Rnd = UnityEngine.Random;
 /// On the Subject of The NCube
 /// Based on the Hyper and Ultracube created by Timwi
 /// </summary>
-public class TheNCubeModule : MonoBehaviour
+public class DimensionKingModule : MonoBehaviour
 {
     public KMBombInfo Bomb;
     public KMBombModule Module;

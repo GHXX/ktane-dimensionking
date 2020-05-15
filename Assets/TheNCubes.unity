@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872716, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.35872743, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1460,7 +1460,7 @@ GameObject:
   - component: {fileID: 645149965}
   - component: {fileID: 645149964}
   m_Layer: 0
-  m_Name: TheNCubeModule
+  m_Name: DimensionKingModule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1488,214 +1488,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 645149963}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb2efe9c6f253714f8e43b121261eda3, type: 3}
+  m_Script: {fileID: 11500000, guid: abc09057047521a4ea0691379f873b70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Bomb: {fileID: 645149967}
   Module: {fileID: 645149969}
   RuleSeedable: {fileID: 645149964}
   Audio: {fileID: 645149966}
-  Ultracube: {fileID: 897621512}
-  Edges:
-  - {fileID: 1861045784}
-  - {fileID: 323006338}
-  - {fileID: 1950847645}
-  - {fileID: 23813031}
-  - {fileID: 252599246}
-  - {fileID: 343827399}
-  - {fileID: 941209624}
-  - {fileID: 1236855393}
-  - {fileID: 346155334}
-  - {fileID: 87375814}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  Vertices:
-  - {fileID: 122606540}
-  - {fileID: 1121614838}
-  - {fileID: 355866197}
-  - {fileID: 801111290}
-  - {fileID: 896862823}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  Faces:
-  - {fileID: 930317040}
-  - {fileID: 258464353}
-  - {fileID: 1624255839}
-  - {fileID: 2060664253}
-  - {fileID: 981484951}
-  - {fileID: 1862277896}
-  - {fileID: 1571350063}
-  - {fileID: 1517505543}
-  - {fileID: 1621540472}
-  - {fileID: 2113535073}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  Quad: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  FaceMaterial: {fileID: 2100000, guid: ad6a48b23a732c74ba4e6082b4079860, type: 2}
-  DiffuseVertexShader: {fileID: 4800000, guid: 3f0d4a2e325f9c24f8251b7b8534a096, type: 3}
-  TransparentVertexShader: {fileID: 10770, guid: 0000000000000000f000000000000000,
-    type: 0}
+  Ultracube: {fileID: 645149970}
+  Edges: []
+  Vertices: []
+  Faces: []
+  Quad: {fileID: 0}
+  FaceMaterial: {fileID: 0}
+  DiffuseVertexShader: {fileID: 0}
+  TransparentVertexShader: {fileID: 0}
 --- !u!114 &645149966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1787,8 +1594,8 @@ MonoBehaviour:
   m_Script: {fileID: -119419473, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModuleType: TheNcubeModule
-  ModuleDisplayName: The N-Cube
+  ModuleType: DimensionKingModule
+  ModuleDisplayName: DimensionKing
   RequiresTimerVisibility: 0
 --- !u!4 &645149970
 Transform:
@@ -2047,7 +1854,7 @@ GameObject:
   m_Component:
   - component: {fileID: 897621512}
   m_Layer: 0
-  m_Name: TheNCube
+  m_Name: DimensionKingObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

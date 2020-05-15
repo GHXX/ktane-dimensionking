@@ -11,9 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
   m_Name: ModConfig
   m_EditorClassIdentifier: 
-  id: TheNCube
-  title: The N-Cube
-  description: More vertices?
-  version: 1.0
+  id: DimensionKing
+  title: Dimension King
+  description: If you think Hypercube and Ultracube are easy, this module is for you!
+  version: 0.1
   outputFolder: build
   previewImage: {fileID: 2800000, guid: f04a755d3d418e24b84bafd8ca72f006, type: 3}

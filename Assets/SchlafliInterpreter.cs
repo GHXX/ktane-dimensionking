@@ -9,7 +9,7 @@ namespace Assets
     {
         internal   static GeoObject InterpretAndCompute()
         {
-
+            return null;
         }
     }
 }

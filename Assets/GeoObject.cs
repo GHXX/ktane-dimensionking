@@ -6,7 +6,7 @@ namespace Assets
     internal class GeoObject
     {
         VertexObject[] VertexLocations;
-        VertexObject[][] FacesToVert
+        FaceObject[] FaceObjects;
 
         
 
