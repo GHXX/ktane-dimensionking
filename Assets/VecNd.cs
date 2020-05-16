@@ -1,15 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace TheNCube
 {
-    struct PointND
+    struct VecNd
     {
-        public double[] Coordinates { get; private set; }
+        public double[] Components { get; private set; }
 
-        public PointND(params double[] coords)
+        public VecNd(params double[] coords)
         {
-            this.Coordinates = coords;
+            this.Components = coords;
         }
 
         private static readonly float wLen = .2f;//1 / Mathf.Sqrt(3);
@@ -30,7 +31,7 @@ namespace TheNCube
             return _nonXyzVectors.Take(amount).ToArray();
         }
 
-        private Vector3[] NonXyzVectors { get { return GetNonXyzVectors(this.Coordinates.Length - 3); } }
+        private Vector3[] NonXyzVectors { get { return GetNonXyzVectors(this.Components.Length - 3); } }
 
         private static Vector3[] CoordGenerator(int amount)
         {
@@ -66,27 +67,56 @@ namespace TheNCube
 
         public Vector3 Project()
         {
-            var retval = new Vector3((float)this.Coordinates[0], (float)this.Coordinates[1], (float)this.Coordinates[2]);
+            var retval = new Vector3((float)this.Components[0], (float)this.Components[1], (float)this.Components[2]);
             for (int dim = 0; dim < this.NonXyzVectors.Length; dim++)
             {
-                retval += (float)this.Coordinates[dim + 3] * this.NonXyzVectors[dim];
+                retval += (float)this.Components[dim + 3] * this.NonXyzVectors[dim];
             }
             return retval;
         }
 
-        public static PointND operator *(PointND p, double[] matrix)
+        public static VecNd operator *(VecNd p, double[] matrix)
         {
-            var args = new double[p.Coordinates.Length];
+            var args = new double[p.Components.Length];
             for (int i = 0; i < args.Length; i++)
             {
                 args[i] = 0;
                 for (int j = 0; j < args.Length; j++)
                 {
-                    args[i] += matrix[i * args.Length + j] * p.Coordinates[j];
+                    args[i] += matrix[i * args.Length + j] * p.Components[j];
                 }
             }
 
-            return new PointND(args);
+            return new VecNd(args);
+        }
+
+        public bool ValueEquals(VecNd other)
+        {
+            if (other.Components.Length != this.Components.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < this.Components.Length; i++)
+            {
+                if (this.Components[i] != other.Components[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            throw new NotImplementedException("Use ValueEquals instead!");
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException("Dont use this!");
         }
     }
 }

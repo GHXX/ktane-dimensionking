@@ -60,7 +60,7 @@
     <Compile Include="Assets\KMScripts\KMRuleSeedable.cs" />
     <Compile Include="Assets\KMScripts\PrivateWhenPlayingAttribute.cs" />
     <Compile Include="Assets\KMScripts\ReadOnlyWhenPlayingAttribute.cs" />
-    <Compile Include="Assets\PointND.cs" />
+    <Compile Include="Assets\VecNd.cs" />
     <Compile Include="Assets\SchlafliInterpreter.cs" />
     <Compile Include="Assets\TestHarness\EdgeworkConfiguration.cs" />
     <Compile Include="Assets\TestHarness\NeedyTimer.cs" />
@@ -83,6 +83,7 @@
     <Compile Include="Assets\TestHarness\Widgets\Widget.cs" />
     <Compile Include="Assets\DimensionKingModule.cs" />
     <Compile Include="Assets\VertexSelectableNDCompound.cs" />
+    <Compile Include="Assets\Helpers.cs" />
     <None Include="Assets\Shaders\KT_3D_Text-Diffuse.shader" />
     <None Include="Assets\Shaders\BlendTwoTexturesUnlit.shader" />
     <None Include="Assets\Shaders\BlendTwoTexturesLitAndUnlitVertexColor.shader" />

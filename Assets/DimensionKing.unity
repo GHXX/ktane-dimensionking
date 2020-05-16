@@ -1596,7 +1596,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ModuleType: DimensionKingModule
   ModuleDisplayName: DimensionKing
-  RequiresTimerVisibility: 0
+  RequiresTimerVisibility: 1
 --- !u!4 &645149970
 Transform:
   m_ObjectHideFlags: 0
