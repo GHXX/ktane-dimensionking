@@ -1,4 +1,4 @@
-﻿using Assets.Editor;
+﻿using DimensionKing.Editor;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;

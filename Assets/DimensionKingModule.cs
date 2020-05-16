@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DimensionKing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,6 +86,8 @@ public class DimensionKingModule : MonoBehaviour
 
     void Start()
     {
+        SchlafliInterpreter.GetGeometryDataFromSchlafli("5/2 3 2".Split(' '));
+
         this._moduleId = _moduleIdCounter++;
         this.dimensionCount = 9;
 
@@ -362,9 +365,9 @@ public class DimensionKingModule : MonoBehaviour
         }
     }
 
-    private PointND[] GetUnrotatedVertices()
+    private VecNd[] GetUnrotatedVertices()
     {
-        return Enumerable.Range(0, 1 << this.dimensionCount).Select(i => new PointND(Enumerable.Range(0, this.dimensionCount).Select(x => (i & (1 << x)) != 0 ? 1d : -1d).ToArray())).ToArray();
+        return Enumerable.Range(0, 1 << this.dimensionCount).Select(i => new VecNd(Enumerable.Range(0, this.dimensionCount).Select(x => (i & (1 << x)) != 0 ? 1d : -1d).ToArray())).ToArray();
     }
 
     private KMSelectable.OnInteractHandler VertexClick(int v)
@@ -579,7 +582,7 @@ public class DimensionKingModule : MonoBehaviour
             var vertexCompound = this.translationCompounds.First(x => x.selectable == newVertexSelection);
 
             this.selectedVertexSelectable = newVertexSelection;
-            this.selectedVertex = vertexCompound.vectorN.Coordinates.Select(x => (bool?)(x > 0)).ToArray();
+            this.selectedVertex = vertexCompound.vectorN.Components.Select(x => (bool?)(x > 0)).ToArray();
         }
 
         UpdateVertexVisibility();
@@ -604,7 +607,7 @@ public class DimensionKingModule : MonoBehaviour
             for (int v = 0; v < 1 << this.dimensionCount; v++)
             {
                 var c = _vertexColorValues[this._vertexColors[v]];
-                var currentVertex = this.translationCompounds.First(x => x.selectable == this.Vertices[v]).vectorN.Coordinates.Select(x => (bool?)(x > 0)).ToArray();
+                var currentVertex = this.translationCompounds.First(x => x.selectable == this.Vertices[v]).vectorN.Components.Select(x => (bool?)(x > 0)).ToArray();
 
                 c.a = (float)Math.Pow(alphaMultiplicator, GetDistanceBetweenVertices(this.selectedVertex, currentVertex));
                 var mat = this.Vertices[v].GetComponent<MeshRenderer>().material;
@@ -732,7 +735,7 @@ public class DimensionKingModule : MonoBehaviour
         return -change / 2 * (t * (t - 2) - 1) + start;
     }
 
-    private void SetNCube(PointND[] verticesNd)
+    private void SetNCube(VecNd[] verticesNd)
     {
         bool overwrite = false;
         if (verticesNd.Length != this.translationCompounds.Length)

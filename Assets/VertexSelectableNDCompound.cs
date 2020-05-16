@@ -8,9 +8,9 @@ namespace TheNCube
     struct VertexSelectableNDCompound
     {
         public KMSelectable selectable;
-        public PointND vectorN;
+        public VecNd vectorN;
 
-        public VertexSelectableNDCompound(KMSelectable selectable, PointND vectorN)
+        public VertexSelectableNDCompound(KMSelectable selectable, VecNd vectorN)
         {
             this.selectable = selectable;
             this.vectorN = vectorN;
