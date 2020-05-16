@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace DimensionKing.Editor
+namespace Assets.Editor
 {
     /// <summary>
     /// Helper class for the KMTableOfContentsEditor that provides a reorderable list for each
