@@ -6,21 +6,16 @@ using UnityEngine;
 
 namespace DimensionKing
 {
-    internal class GeoObject : MonoBehaviour
+    internal class GeoObject : ScriptableObject
     {
-        private readonly List<VertexObject> VertexLocations;
-        private readonly List<EdgeObject> EdgeObjects;
-        private readonly List<FaceObject> FaceObjects;
+        private List<VertexObject> VertexLocations;
+        private List<EdgeObject> EdgeObjects;
+        private List<FaceObject> FaceObjects;
 
         private int dimensionCount = 0;
 
 
-        public GeoObject(Transform baseVertex, Transform baseEdge, Transform baseFace)
-        {
-            this.VertexLocations = new List<VertexObject>() { new VertexObject(new VecNd()) { vertexTransform = baseVertex } };
-            this.EdgeObjects = new List<EdgeObject>();
-            this.FaceObjects = new List<FaceObject>();
-        }
+        public GeoObject() { }
 
         //public void SetupAndResolveVertices() // link vertices to VertexLocations[].ModuleVertex create and delete as needed, same for edges and faces
         //{
@@ -67,17 +62,16 @@ namespace DimensionKing
             DestroyExessAndCreateRequired(this.VertexLocations, newVertexPositions.Length);
             for (int i = 0; i < newVertexPositions.Length; i++)
             {
-                this.VertexLocations[i].position = new VecNd(newVertexPositions[i].Cast<double>().ToArray());
+                this.VertexLocations[i].position = new VecNd(newVertexPositions[i].Select(x => (double)x).ToArray());
             }
 
-            DestroyExessAndCreateRequired(this.EdgeObjects, newVertexPositions.Length);
+            DestroyExessAndCreateRequired(this.EdgeObjects, newEdgeVertexIds.Length);
             for (int i = 0; i < newEdgeVertexIds.Length; i++)
             {
                 this.EdgeObjects[i].vertexObjects = newEdgeVertexIds[i].Select(x => this.VertexLocations[x]).ToArray();
-                this.EdgeObjects[i].RecalculateMesh();
             }
 
-            DestroyExessAndCreateRequired(this.FaceObjects, newVertexPositions.Length);
+            DestroyExessAndCreateRequired(this.FaceObjects, newFaceVertexIds.Length);
             for (int i = 0; i < newFaceVertexIds.Length; i++)
             {
                 this.FaceObjects[i].vertexObjects = newFaceVertexIds[i].Select(x => this.VertexLocations[x]).ToArray();
@@ -86,8 +80,31 @@ namespace DimensionKing
             RecalculateMeshes();
         }
 
+        internal void SetBaseObject(Transform baseVertex, Transform baseEdge, Transform baseFace)
+        {
+            this.VertexLocations = new List<VertexObject>() { new VertexObject(new VecNd()) { vertexTransform = baseVertex } };
+            this.EdgeObjects = new List<EdgeObject>() {
+                new EdgeObject(new[] { this.VertexLocations[0], this.VertexLocations[0] })
+                {
+                    edgeMesh = baseEdge.GetComponent<MeshFilter>(), edgeTransform = baseEdge
+                }
+            };
+
+            this.FaceObjects = new List<FaceObject>() {
+                new FaceObject(new[] { this.VertexLocations[0], this.VertexLocations[0], this.VertexLocations[0], this.VertexLocations[0] })
+                {
+                    faceMesh = baseFace.GetComponent<MeshFilter>(), faceTransform = baseFace
+                }
+            };
+        }
+
         private void RecalculateMeshes()
         {
+            for (int i = 0; i < this.VertexLocations.Count; i++)
+            {
+                this.VertexLocations[i].UpdatePosition();
+            }
+
             for (int i = 0; i < this.EdgeObjects.Count; i++)
             {
                 this.EdgeObjects[i].RecalculateMesh();
@@ -130,16 +147,32 @@ namespace DimensionKing
         {
             if (newCount < collection.Count) // if the new array shield have less items than the previous then destroy the excess ones
             {
-                for (int i = collection.Count - 1; i >= newCount; i--)
+                int delCount = collection.Count - newCount;
+
+                for (int i = 0; i < delCount; i++)
                 {
-                    collection[i].Destroy();
+                    collection[collection.Count - 1].Destroy();
+                    collection.RemoveAt(collection.Count - 1);
                 }
             }
             else if (newCount > collection.Count)
             {
-                for (int i = collection.Count - 1; i >= newCount; i--)
+                int addCount = newCount - collection.Count;
+                for (int i = 0; i < addCount; i++)
                 {
-                    collection[i] = collection[0].CreateNewInstance();
+                    var baseTransform = collection[0].GetTransform();
+
+                    var clone = collection[0].CreateNewInstance();
+                    var cloneTransform = clone.GetTransform();
+
+                    var basename = baseTransform.name;
+                    cloneTransform.name = basename.Substring(0, basename.Length - 1) + (i + 1);
+                    cloneTransform.parent = baseTransform.parent;
+                    cloneTransform.localScale = baseTransform.localScale;
+                    cloneTransform.localPosition = baseTransform.localPosition;
+
+                    collection.Add(clone);
+
                 }
             }
         }
@@ -149,11 +182,12 @@ namespace DimensionKing
             internal VecNd position;
             internal Transform vertexTransform;
 
-            private Vector3 projectedCache = new VecNd().Project();
+            private Vector3 projectedCache = new VecNd(new double[] { 0, 0, 0, 0 }).Project();
             private VecNd projectedCachedInput = new VecNd();
             internal Vector3 ProjectTo3D()
             {
-                if (!this.position.ValueEquals(this.projectedCachedInput)) // TODO check if the cache code is actually useful in terms of cpu efficiency
+                if (true || !this.position.ValueEquals(this.projectedCachedInput)) // TODO reenable
+                                                                                   // TODO check if the cache code is actually useful in terms of cpu efficiency
                 {
                     this.projectedCachedInput = this.position;
                     this.projectedCache = this.position.Project();
@@ -179,6 +213,16 @@ namespace DimensionKing
             VertexObject IDestroyable<VertexObject>.CreateNewInstance()
             {
                 return new VertexObject(Instantiate(this.vertexTransform));
+            }
+
+            public Transform GetTransform()
+            {
+                return this.vertexTransform;
+            }
+
+            internal void UpdatePosition()
+            {
+                this.vertexTransform.localPosition = ProjectTo3D();
             }
         }
 
@@ -211,7 +255,8 @@ namespace DimensionKing
 
             EdgeObject IDestroyable<EdgeObject>.CreateNewInstance()
             {
-                return new EdgeObject(Instantiate(this.edgeMesh), Instantiate(this.edgeTransform));
+                var t = Instantiate(this.edgeTransform);
+                return new EdgeObject(t.GetComponent<MeshFilter>(), t);
             }
 
             internal Vector3[] GetEdgeVertexPositions()
@@ -234,9 +279,17 @@ namespace DimensionKing
                 var deltaVector = pos2 - pos1;
                 var deltaVectorNormalized = deltaVector.normalized;
                 this.edgeMesh.transform.localPosition = (pos1 + pos2) / 2;
-                this.edgeMesh.transform.localScale = new Vector3(0.1f, deltaVector.magnitude, 0.1f);
+                this.edgeMesh.transform.localScale = new Vector3(0.1f, deltaVector.magnitude / 2f, 0.1f);
 
-                this.edgeMesh.transform.rotation = new Quaternion(deltaVectorNormalized.x, deltaVectorNormalized.y, deltaVectorNormalized.z, 0);
+                //this.edgeMesh.transform.localRotation = Quaternion.LookRotation(deltaVector, Vector3.up);
+                //var rot = Quaternion.Euler(deltaVectorNormalized.x, deltaVectorNormalized.y, deltaVectorNormalized.z);
+                //rot.eulerAngles.z += 90;
+                //var r = Quaternion.FromToRotation(pos1, pos2);
+                this.edgeMesh.transform.localRotation = Quaternion.FromToRotation(Vector3.up, pos2 - pos1);
+            }
+            public Transform GetTransform()
+            {
+                return this.edgeTransform;
             }
         }
 
@@ -269,7 +322,8 @@ namespace DimensionKing
 
             FaceObject IDestroyable<FaceObject>.CreateNewInstance()
             {
-                return new FaceObject(Instantiate(this.faceMesh), Instantiate(this.faceTransform));
+                var t = Instantiate(this.faceTransform);
+                return new FaceObject(t.GetComponent<MeshFilter>(), t);
             }
 
             internal Vector3[] GetFaceVertexPositions()
@@ -286,8 +340,42 @@ namespace DimensionKing
 
             internal void RecalculateMesh()
             {
-                this.faceMesh.mesh.vertices = GetFaceVertexPositions();
+                this.faceMesh.mesh.Clear();
+                var vertices = GetFaceVertexPositions();
+                this.faceMesh.mesh.vertices = vertices;
+
+                int[] triangleIndices;
+
+                switch (vertices.Length)
+                {
+                    case 3: triangleIndices = new[] { 0, 1, 2 }; break;
+                    case 4:
+                        triangleIndices = new[] {
+                        0, 1, 2,
+                        1, 2, 3
+                    }; break;
+                    case 5:
+                        triangleIndices = new[] {
+                        0, 1, 2,
+                        0, 2, 3,
+                        0, 3, 4
+                    }; break;
+                    case 6:
+                        triangleIndices = new[] {
+                        0, 1, 2,
+                        2, 3, 5,
+                        3, 4, 5,
+                        5, 0, 2,
+                    }; break;
+                    default: throw new NotImplementedException();
+                }
+
+                this.faceMesh.mesh.triangles = triangleIndices;
                 this.faceMesh.mesh.RecalculateNormals();
+            }
+            public Transform GetTransform()
+            {
+                return this.faceTransform;
             }
         }
 
@@ -295,6 +383,8 @@ namespace DimensionKing
         {
             void Destroy();
             T CreateNewInstance();
+
+            Transform GetTransform();
         }
     }
 }

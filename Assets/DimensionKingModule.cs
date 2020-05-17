@@ -88,7 +88,8 @@ public class DimensionKingModule : MonoBehaviour
 
 
         var schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(schlafli.Split(' ')); // TODO allow stuff like "5/2 3 2"
-        var geoObject = new GeoObject(this.BaseVertex, this.BaseEdge, this.BaseFace);
+        var geoObject = ScriptableObject.CreateInstance<GeoObject>();
+        geoObject.SetBaseObject(this.BaseVertex, this.BaseEdge, this.BaseFace);
         geoObject.LoadVerticesEdgesAndFaces(schlafliData.VertexLocations, schlafliData.EdgeVertexIndexes, schlafliData.FaceVertexIndexes);
         this._moduleId = _moduleIdCounter++;
 

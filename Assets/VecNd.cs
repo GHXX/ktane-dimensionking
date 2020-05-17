@@ -92,6 +92,11 @@ namespace TheNCube
 
         public bool ValueEquals(VecNd other)
         {
+            if (other.Components == null || this.Components == null) // if either are null then return whether both are null
+            {
+                return (other.Components == null) && (this.Components == null);
+            }
+
             if (other.Components.Length != this.Components.Length)
             {
                 return false;

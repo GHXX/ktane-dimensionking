@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{3030A226-C625-00A3-76A7-8E17CC19673D}</ProjectGuid>
+    <ProjectGuid>{D89AD4ED-C6FA-AB27-0772-04DAA17D30D6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
@@ -342,10 +342,10 @@
  <HintPath>C:/Program Files/Unity/Hub/Editor/2017.4.29f1/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
  <Reference Include="KMFramework">
- <HintPath>D:/UnityProjects/ktanemodding/the-n-cubes/Assets/Plugins/Managed/KMFramework.dll</HintPath>
+ <HintPath>D:/UnityProjects/ktanemodding/ktane-dimensionking/Assets/Plugins/Managed/KMFramework.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>D:/UnityProjects/ktanemodding/the-n-cubes/Assets/Plugins/Managed/Newtonsoft.Json.dll</HintPath>
+ <HintPath>D:/UnityProjects/ktanemodding/ktane-dimensionking/Assets/Plugins/Managed/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Advertisements">
  <HintPath>C:/Users/Georg Honauer/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
@@ -368,7 +368,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{20589826-60DC-C5A1-E529-14A1880211EA}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
+      <Project>{4282B79B-C757-5225-7FD4-184F52CB6B1D}</Project>      <Name>Assembly-CSharp</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
