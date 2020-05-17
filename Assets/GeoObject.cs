@@ -12,17 +12,14 @@ namespace DimensionKing
         private readonly List<EdgeObject> EdgeObjects;
         private readonly List<FaceObject> FaceObjects;
 
-        private readonly DimensionKingModule module;
         private int dimensionCount = 0;
 
 
-        public GeoObject(DimensionKingModule module, Transform baseVertex, Transform baseEdge, Transform baseFace)
+        public GeoObject(Transform baseVertex, Transform baseEdge, Transform baseFace)
         {
-            this.VertexLocations = new List<VertexObject>();
+            this.VertexLocations = new List<VertexObject>() { new VertexObject(new VecNd()) { vertexTransform = baseVertex } };
             this.EdgeObjects = new List<EdgeObject>();
             this.FaceObjects = new List<FaceObject>();
-
-            this.module = module;
         }
 
         //public void SetupAndResolveVertices() // link vertices to VertexLocations[].ModuleVertex create and delete as needed, same for edges and faces
@@ -63,14 +60,14 @@ namespace DimensionKing
         //    }
         //}
 
-        public void LoadVerticesEdgesAndFaces(double[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds)
+        public void LoadVerticesEdgesAndFaces(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds)
         {
             this.dimensionCount = newVertexPositions[0].Length;
 
             DestroyExessAndCreateRequired(this.VertexLocations, newVertexPositions.Length);
             for (int i = 0; i < newVertexPositions.Length; i++)
             {
-                this.VertexLocations[i].position = new VecNd(newVertexPositions[i]);
+                this.VertexLocations[i].position = new VecNd(newVertexPositions[i].Cast<double>().ToArray());
             }
 
             DestroyExessAndCreateRequired(this.EdgeObjects, newVertexPositions.Length);
@@ -188,6 +185,7 @@ namespace DimensionKing
         internal class EdgeObject : IDestroyable<EdgeObject>
         {
             internal VertexObject[] vertexObjects;
+            internal Transform edgeTransform;
             internal MeshFilter edgeMesh;
 
             public EdgeObject(VertexObject[] vertexObjects)
@@ -200,9 +198,10 @@ namespace DimensionKing
                 this.vertexObjects = vertexObjects;
             }
 
-            private EdgeObject(MeshFilter mesh)
+            private EdgeObject(MeshFilter mesh, Transform t)
             {
                 this.edgeMesh = mesh;
+                this.edgeTransform = t;
             }
 
             void IDestroyable<EdgeObject>.Destroy()
@@ -212,7 +211,7 @@ namespace DimensionKing
 
             EdgeObject IDestroyable<EdgeObject>.CreateNewInstance()
             {
-                return new EdgeObject(Instantiate(this.edgeMesh));
+                return new EdgeObject(Instantiate(this.edgeMesh), Instantiate(this.edgeTransform));
             }
 
             internal Vector3[] GetEdgeVertexPositions()
@@ -245,6 +244,7 @@ namespace DimensionKing
         {
             internal VertexObject[] vertexObjects;
             internal MeshFilter faceMesh;
+            internal Transform faceTransform;
 
             public FaceObject(VertexObject[] vertexObjects)
             {
@@ -256,9 +256,10 @@ namespace DimensionKing
                 this.vertexObjects = vertexObjects;
             }
 
-            private FaceObject(MeshFilter mesh)
+            private FaceObject(MeshFilter mesh, Transform t)
             {
                 this.faceMesh = mesh;
+                this.faceTransform = t;
             }
 
             void IDestroyable<FaceObject>.Destroy()
@@ -268,7 +269,7 @@ namespace DimensionKing
 
             FaceObject IDestroyable<FaceObject>.CreateNewInstance()
             {
-                return new FaceObject(Instantiate(this.faceMesh));
+                return new FaceObject(Instantiate(this.faceMesh), Instantiate(this.faceTransform));
             }
 
             internal Vector3[] GetFaceVertexPositions()

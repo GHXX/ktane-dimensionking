@@ -15,7 +15,7 @@ namespace DimensionKing
             bool isOK = TryRegularPolytope(schlafliFloats, out vertexPositions, out vertexIndexes);
             string st = vertexPositions.Select(x => x.Select(n => Math.Round(n, 4).ToString()).Join()).Join("\n");
 
-            var s = new SchlafliStruct() { };
+            var s = new SchlafliStruct(vertexPositions, vertexIndexes[0], vertexIndexes[1]);
 
             return s;
         }
@@ -79,8 +79,8 @@ namespace DimensionKing
 
             foreach (var facetElementsOfSomeDimension in facetEdgesEtc)
             {
-                var elts = new List<int[]>(facetElementsOfSomeDimension);
-                var elt2index = Enumerable.Range(0, elts.Count).ToDictionary(i => elts[i], i => i);
+                var elts = new List<int[]>(facetElementsOfSomeDimension.Select(x=>(int[])x.Clone()).ToArray());
+                var elt2index = Enumerable.Range(0, elts.Count).ToDictionary(i => elts[i].Join(","), i => i);
                 var iElt = 0;
                 while (iElt < elts.Count)
                 {
@@ -88,9 +88,9 @@ namespace DimensionKing
                     {
                         // TODO make sure the cast doesnt actually break it all
                         var newElt = elts[iElt].Select(iVert2 => (int)multiplicationTable[iVert2][iGen]).OrderBy(x => x).ToArray(); // ivert2 is ambiguous to ivert in the pyscript
-                        if (!elt2index.Any(x => Enumerable.Range(0, newElt.Length).Any(i => newElt[i] == x.Key[i])))
+                        if (!elt2index.ContainsKey(newElt.Join(",")))
                         {
-                            elt2index.Add(newElt, elts.Count);
+                            elt2index.Add(newElt.Join(","), elts.Count);
                             elts.Add(newElt);
                         }
                     }
@@ -251,9 +251,9 @@ namespace DimensionKing
 
         internal struct SchlafliStruct
         {
-            float[][] VertexLocations;
-            int[][] EdgeVertexIndexes;
-            int[][] FaceVertexIndexes;
+            public float[][] VertexLocations { get; private set; }
+            public int[][] EdgeVertexIndexes { get; private set; }
+            public int[][] FaceVertexIndexes { get; private set; }
 
             public SchlafliStruct(float[][] vertexLocations, int[][] edgeVertexIndexes, int[][] faceVertexIndexes)
             {
