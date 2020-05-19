@@ -13,7 +13,31 @@ namespace DimensionKing
             List<int[][]> vertexIndexes;
 
             bool isOK = TryRegularPolytope(schlafliFloats, out vertexPositions, out vertexIndexes);
-            string st = vertexPositions.Select(x => x.Select(n => Math.Round(n, 4).ToString()).Join()).Join("\n");
+            //string st = vertexPositions.Select(x => x.Select(n => Math.Round(n, 4).ToString()).Join()).Join("\n");
+
+            // center the vertices
+
+
+            for (int dim = 0; dim < vertexPositions[0].Length; dim++) // loop all dimensions
+            {
+                float min = vertexPositions[0][dim];
+                float max = min;
+
+                for (int vertexIndex = 0; vertexIndex < vertexPositions.Length; vertexIndex++)
+                {
+                    var pos = vertexPositions[vertexIndex][dim];
+                    min = Math.Min(pos, min);
+                    max = Math.Max(pos, max);
+                }
+
+                float delta = (min + max) / 2;
+
+                for (int vi = 0; vi < vertexPositions.Length; vi++)
+                {
+                    vertexPositions[vi][dim] -= delta;
+                }
+
+            }
 
             var s = new SchlafliStruct(vertexPositions, vertexIndexes[0], vertexIndexes[1]);
 
@@ -79,7 +103,7 @@ namespace DimensionKing
 
             foreach (var facetElementsOfSomeDimension in facetEdgesEtc)
             {
-                var elts = new List<int[]>(facetElementsOfSomeDimension.Select(x=>(int[])x.Clone()).ToArray());
+                var elts = new List<int[]>(facetElementsOfSomeDimension.Select(x => (int[])x.Clone()).ToArray());
                 var elt2index = Enumerable.Range(0, elts.Count).ToDictionary(i => elts[i].Join(","), i => i);
                 var iElt = 0;
                 while (iElt < elts.Count)

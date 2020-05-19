@@ -12,7 +12,7 @@ namespace DimensionKing
         private List<EdgeObject> EdgeObjects;
         private List<FaceObject> FaceObjects;
 
-        private int dimensionCount = 0;
+        public int dimensionCount = 0;
 
 
         public GeoObject() { }
@@ -100,10 +100,17 @@ namespace DimensionKing
 
         private void RecalculateMeshes()
         {
+            var min = this.VertexLocations[0].UpdatePosition();
+            var max = min;
+
             for (int i = 0; i < this.VertexLocations.Count; i++)
             {
-                this.VertexLocations[i].UpdatePosition();
+                var newPos = this.VertexLocations[i].UpdatePosition();
+                min = Vector3.Min(newPos, min);
+                max = Vector3.Max(newPos, max);
             }
+
+            //this.VertexLocations[0].GetTransform().parent.localPosition = (min + max) / 2;
 
             for (int i = 0; i < this.EdgeObjects.Count; i++)
             {
@@ -121,10 +128,9 @@ namespace DimensionKing
         /// </summary>
         /// <param name="axisIndexA"></param>
         /// <param name="axisIndexB"></param>
-        /// <param name="progress">The progress of the current rotation</param>
-        public void Rotate(int axisIndexA, int axisIndexB, float progress)
+        /// <param name="angle">How much to rotate it by.</param>
+        public void Rotate(int axisIndexA, int axisIndexB, float angle)
         {
-            var angle = Helpers.GetRotationProgress(progress, 3);
             var matrix = new double[this.dimensionCount * this.dimensionCount];
             for (int i = 0; i < this.dimensionCount; i++)
                 for (int j = 0; j < this.dimensionCount; j++)
@@ -139,7 +145,6 @@ namespace DimensionKing
             {
                 this.VertexLocations[i].position *= matrix;
             }
-
             RecalculateMeshes();
         }
 
@@ -220,9 +225,12 @@ namespace DimensionKing
                 return this.vertexTransform;
             }
 
-            internal void UpdatePosition()
+            internal Vector3 UpdatePosition()
             {
-                this.vertexTransform.localPosition = ProjectTo3D();
+                var pos = ProjectTo3D();
+                this.vertexTransform.localPosition = pos;
+
+                return pos;
             }
         }
 

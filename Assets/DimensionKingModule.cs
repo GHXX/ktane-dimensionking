@@ -1,5 +1,6 @@
 ﻿using DimensionKing;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -33,19 +34,18 @@ public class DimensionKingModule : MonoBehaviour
     private static int _moduleIdCounter = 1;
     private int _moduleId;
 
-    private int[] _rotations;
+    private string[] _rotations;
     private float _hue, _sat, _v;
     private Coroutine _rotationCoroutine;
     private bool _transitioning;
     private int _progress;
     private int[] _vertexColors;
     private int _correctVertex;
-    private string[] _rotationNames = new string[0];
-    private string[] _shapeNames = new string[0];
 
     private static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
 
     private static readonly string[] possibleShapes = "3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;5 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');
+    private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
 
     //private static readonly string[][] _dimensionNames = new[] { 
     //                                // dim|Axis
@@ -63,10 +63,12 @@ public class DimensionKingModule : MonoBehaviour
     private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
     private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
 
-    private int dimensionCount = -1; // from 6 to 9 (inclusive)
+    private int GetDimensionCount() { return this.geoObject.dimensionCount; }
     private bool hideFaces = true;
+    private GeoObject geoObject;
+    private MonoRandom rand = new MonoRandom();
 
-    private string GetCurrentAxesChars() { return _axesNames.Take(this.dimensionCount).Join(""); }
+    private string GetCurrentAxesChars() { return _axesNames.Take(GetDimensionCount()).Join(""); }
 
     private int GetVertexAndOtherCount(int dimensionCount_n, int faceDimension_m) // m == 0 = vertex // m == 1 = edge // m == 2 = face ...
     {
@@ -82,15 +84,33 @@ public class DimensionKingModule : MonoBehaviour
     void Start()
     {
         var schlafli = possibleShapes.PickRandom();
-        schlafli = "3 4 3";
+        //schlafli = "4 3 3";
 
         Log("Picked the following shape: {" + schlafli.Replace(' ', ',') + "}");
 
 
         var schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(schlafli.Split(' ')); // TODO allow stuff like "5/2 3 2"
-        var geoObject = ScriptableObject.CreateInstance<GeoObject>();
-        geoObject.SetBaseObject(this.BaseVertex, this.BaseEdge, this.BaseFace);
-        geoObject.LoadVerticesEdgesAndFaces(schlafliData.VertexLocations, schlafliData.EdgeVertexIndexes, schlafliData.FaceVertexIndexes);
+        this.geoObject = ScriptableObject.CreateInstance<GeoObject>();
+        this.geoObject.SetBaseObject(this.BaseVertex, this.BaseEdge, this.BaseFace);
+
+
+        float scaleFactor = 2;
+
+        this.geoObject.LoadVerticesEdgesAndFaces(
+            schlafliData.VertexLocations.Select(x => x.Select(y => y * scaleFactor).ToArray()).ToArray(), schlafliData.EdgeVertexIndexes, schlafliData.FaceVertexIndexes);
+
+
+        var relevantAxesNames = _axesNames.Take(GetDimensionCount()).ToArray();
+
+        var rotCombinations = Enumerable.Range(0, relevantAxesNames.Length)
+            .SelectMany(i => Enumerable.Range(i + 1, relevantAxesNames.Length - i - 1)
+            .Select(j => relevantAxesNames[i].ToString() + relevantAxesNames[j].ToString()))
+            .SelectMany(x => new[] { x, x[1].ToString() + x[0].ToString() }).ToArray();
+
+        this._rotations = Enumerable.Range(0, 5).Select(x => rotCombinations[this.rand.Next(rotCombinations.Length)]).ToArray();
+
+        Log("Rotations are: " + string.Join(", ", this._rotations));
+
         this._moduleId = _moduleIdCounter++;
 
 
@@ -228,7 +248,7 @@ public class DimensionKingModule : MonoBehaviour
         //for (var i = 0; i < this.Vertices.Count(); i++)
         //    this.Vertices[i].OnInteract = VertexClick(i);
 
-        //this._rotationCoroutine = StartCoroutine(RotateUltracube());
+        this._rotationCoroutine = StartCoroutine(RotateDimKing());
     }
 
     //private void SetupFacesRecursively(MonoRandom rnd, int depth = 1, params int[] forloopvars) // forloopvars contains the variables dimSkip,a,b,c... of the recursive forloops
@@ -584,59 +604,55 @@ public class DimensionKingModule : MonoBehaviour
     //    this._facesMat.color = clr;
     //}
 
-    //private IEnumerator RotateUltracube(bool delay = false)
-    //{
-    //    var colorChange = ColorChange(delay: delay);
-    //    while (colorChange.MoveNext())
-    //        yield return colorChange.Current;
+    private IEnumerator RotateDimKing(bool delay = false)
+    {
+        //var colorChange = ColorChange(delay: delay);
+        //while (colorChange.MoveNext())
+        //    yield return colorChange.Current;
 
-    //    var unrotatedVertices = GetUnrotatedVertices();
-    //    SetNCube(unrotatedVertices);
+        //var unrotatedVertices = GetUnrotatedVertices();
+        //SetNCube(unrotatedVertices);
 
-    //    while (!this._transitioning)
-    //    {
-    //        yield return new WaitForSeconds(Rnd.Range(1.75f, 2.25f));
+        while (!this._transitioning)
+        {
+            yield return new WaitForSeconds(Rnd.Range(1.75f, 2.25f));
 
-    //        for (int rot = 0; rot < this._rotations.Length && !this._transitioning; rot++)
-    //        {
-    //            var axis1 = GetCurrentAxesChars().IndexOf(this._rotationNames[this._rotations[rot]][0]);
-    //            var axis2 = GetCurrentAxesChars().IndexOf(this._rotationNames[this._rotations[rot]][1]);
-    //            var duration = 2f;
-    //            var elapsed = 0f;
+            for (int rot = 0; rot < this._rotations.Length && !this._transitioning; rot++)
+            {
+                var currRotName = this._rotations[rot];
 
-    //            while (elapsed < duration)
-    //            {
-    //                var angle = EaseInOutQuad(elapsed, 0, Mathf.PI / 2, duration);
-    //                var matrix = new double[this.dimensionCount * this.dimensionCount];
-    //                for (int i = 0; i < this.dimensionCount; i++)
-    //                    for (int j = 0; j < this.dimensionCount; j++)
-    //                        matrix[i + this.dimensionCount * j] =
-    //                            i == axis1 && j == axis1 ? Mathf.Cos(angle) :
-    //                            i == axis1 && j == axis2 ? Mathf.Sin(angle) :
-    //                            i == axis2 && j == axis1 ? -Mathf.Sin(angle) :
-    //                            i == axis2 && j == axis2 ? Mathf.Cos(angle) :
-    //                            i == j ? 1 : 0;
+                var axis1 = GetCurrentAxesChars().IndexOf(currRotName[0]);
+                var axis2 = GetCurrentAxesChars().IndexOf(currRotName[1]);
+                var duration = 2f;
+                var elapsed = 0f;
 
-    //                SetNCube(unrotatedVertices.Select(v => (v * matrix)).ToArray());
+                float totalRotationAngle = (float)(this.rand.NextDouble() * 90f + 45f);
+                float rotationDone = 0f;
 
-    //                yield return null;
-    //                elapsed += Time.deltaTime;
-    //            }
+                while (elapsed < duration)
+                {
+                    float currRot = Helpers.GetRotationProgress(elapsed / duration, 3);
+                    float delta = Math.Max(0, currRot - rotationDone);
+                    rotationDone += delta;
 
-    //            // Reset the position of the NCube
-    //            SetNCube(unrotatedVertices);
-    //            yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
-    //        }
+                    this.geoObject.Rotate(axis1, axis2, delta);
+
+                    yield return null;
+                    elapsed += Time.deltaTime;
+                }
+
+                yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
+            }
 
 
-    //        //var colorChange2 = ColorChange(delay: true, skipGrey: true);
-    //        //while (colorChange2.MoveNext())
-    //        //    yield return colorChange2.Current;
-    //    }
+            //var colorChange2 = ColorChange(delay: true, skipGrey: true);
+            //while (colorChange2.MoveNext())
+            //    yield return colorChange2.Current;
+        }
 
-    //    this._transitioning = false;
-    //    this._rotationCoroutine = null;
-    //}
+        this._transitioning = false;
+        this._rotationCoroutine = null;
+    }
 
     //private static float EaseInOutQuad(float t, float start, float end, float duration)
     //{
