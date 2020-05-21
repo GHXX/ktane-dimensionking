@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 using Rnd = UnityEngine.Random;
@@ -83,6 +84,7 @@ public class DimensionKingModule : MonoBehaviour
 
     void Start()
     {
+        this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
         var schlafli = possibleShapes.PickRandom();
         //schlafli = "4 3 3";
 
@@ -111,7 +113,6 @@ public class DimensionKingModule : MonoBehaviour
 
         Log("Rotations are: " + string.Join(", ", this._rotations));
 
-        this._moduleId = _moduleIdCounter++;
 
 
 
