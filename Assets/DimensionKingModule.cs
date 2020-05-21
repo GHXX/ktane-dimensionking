@@ -94,7 +94,7 @@ public class DimensionKingModule : MonoBehaviour
         this.geoObject.SetBaseObjects(this.BaseVertex, this.BaseEdge, this.BaseFace);
 
 
-        float scaleFactor = 2;
+        float scaleFactor = 2.5f;
 
         this.geoObject.LoadVerticesEdgesAndFaces(
             schlafliData.VertexLocations.Select(x => x.Select(y => y * scaleFactor).ToArray()).ToArray(), schlafliData.EdgeVertexIndexes, schlafliData.FaceVertexIndexes);

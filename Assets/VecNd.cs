@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace TheNCube
+namespace DimensionKing
 {
     struct VecNd
     {
@@ -95,7 +94,7 @@ namespace TheNCube
         {
             return new VecNd(v.Components.Select(x => x * scale).ToArray());
         }
-        
+
         public static VecNd operator +(VecNd v1, VecNd v2)
         {
             if (v1.Components.Length != v2.Components.Length)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheNCube;
 using UnityEngine;
 
 namespace DimensionKing
@@ -14,14 +13,14 @@ namespace DimensionKing
         internal VecNd[] GetVertexLocations { get { return this.VertexLocations.Select(x => x.position).ToArray(); } }
         internal void SetVertexLocations(VecNd[] newLocations)
         {
-            if (newLocations.Length != VertexLocations.Count)
+            if (newLocations.Length != this.VertexLocations.Count)
             {
                 throw new ArgumentException("The length of the passed vertice array is not equal to the expected length!");
             }
 
             for (int i = 0; i < newLocations.Length; i++)
             {
-                VertexLocations[i].position = newLocations[i];
+                this.VertexLocations[i].position = newLocations[i];
             }
 
             RecalculateMeshes();
@@ -34,44 +33,6 @@ namespace DimensionKing
 
 
         public GeoObject() { }
-
-        //public void SetupAndResolveVertices() // link vertices to VertexLocations[].ModuleVertex create and delete as needed, same for edges and faces
-        //{
-        //    var dmko = module.transform.GetChild(0).transform; // dimensionKingObject
-        //    if (!this.initialized)
-        //    {
-        //        for (int i = 0; i < dmko.childCount; i++) // resolve base-building-blocks to be able to duplicate them later
-        //        {
-        //            var child = dmko.GetChild(i);
-        //            var meshKind = child.GetComponent<MeshFilter>().mesh;
-
-        //            if (meshKind.vertexCount == 1) // this is a vertex
-        //            {
-        //                if (this.baseVertex == null)
-        //                {
-        //                    this.baseVertex = child;
-        //                }
-        //            }
-        //            else if (meshKind.vertexCount == 1) // this is a edge
-        //            {
-        //                if (this.baseEdge == null)
-        //                {
-        //                    this.baseEdge = child;
-        //                }
-        //            }
-        //            else // this is a face
-        //            {
-        //                if (this.baseFace == null)
-        //                {
-        //                    this.baseFace = child;
-        //                }
-        //            }
-        //        }
-
-
-        //        this.initialized = true;
-        //    }
-        //}
 
         public void LoadVerticesEdgesAndFaces(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds)
         {
@@ -309,10 +270,6 @@ namespace DimensionKing
                 this.edgeMesh.transform.localPosition = (pos1 + pos2) / 2;
                 this.edgeMesh.transform.localScale = new Vector3(0.1f, deltaVector.magnitude / 2f, 0.1f);
 
-                //this.edgeMesh.transform.localRotation = Quaternion.LookRotation(deltaVector, Vector3.up);
-                //var rot = Quaternion.Euler(deltaVectorNormalized.x, deltaVectorNormalized.y, deltaVectorNormalized.z);
-                //rot.eulerAngles.z += 90;
-                //var r = Quaternion.FromToRotation(pos1, pos2);
                 this.edgeMesh.transform.localRotation = Quaternion.FromToRotation(Vector3.up, pos2 - pos1);
             }
             public Transform GetTransform()
@@ -417,7 +374,7 @@ namespace DimensionKing
 
         internal void Reset()
         {
-            SetVertexLocations(OriginalVertexLocations);            
+            SetVertexLocations(this.OriginalVertexLocations);
         }
     }
 }
