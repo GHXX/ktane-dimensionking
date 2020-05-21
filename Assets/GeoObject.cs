@@ -172,7 +172,7 @@ namespace DimensionKing
             private VecNd projectedCachedInput = new VecNd();
             internal Vector3 ProjectTo3D()
             {
-                if (true || !this.position.ValueEquals(this.projectedCachedInput)) // TODO reenable
+                if (true || !this.position.ValueEquals(this.projectedCachedInput)) // TODO reenable, seems like its actually counter productive
                                                                                    // TODO check if the cache code is actually useful in terms of cpu efficiency
                 {
                     this.projectedCachedInput = this.position;
