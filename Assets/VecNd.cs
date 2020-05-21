@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace TheNCube
@@ -88,6 +89,24 @@ namespace TheNCube
             }
 
             return new VecNd(args);
+        }
+
+        public static VecNd operator *(VecNd v, float scale)
+        {
+            return new VecNd(v.Components.Select(x => x * scale).ToArray());
+        }
+        
+        public static VecNd operator +(VecNd v1, VecNd v2)
+        {
+            if (v1.Components.Length != v2.Components.Length)
+                throw new ArgumentException("The vectors are of different dimensions!");
+
+            for (int i = 0; i < v2.Components.Length; i++)
+            {
+                v1.Components[i] += v2.Components[i];
+            }
+
+            return v1;
         }
 
         public bool ValueEquals(VecNd other)

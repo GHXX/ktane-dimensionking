@@ -91,7 +91,7 @@ public class DimensionKingModule : MonoBehaviour
 
         var schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(schlafli.Split(' ')); // TODO allow stuff like "5/2 3 2"
         this.geoObject = ScriptableObject.CreateInstance<GeoObject>();
-        this.geoObject.SetBaseObject(this.BaseVertex, this.BaseEdge, this.BaseFace);
+        this.geoObject.SetBaseObjects(this.BaseVertex, this.BaseEdge, this.BaseFace);
 
 
         float scaleFactor = 2;
@@ -643,7 +643,28 @@ public class DimensionKingModule : MonoBehaviour
 
                 yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
             }
+            // TODO make it return all vertices to the start. Just linearly :)
 
+            var returnDuration = 2f;
+            var returnElapsed = 0f;
+
+            var vertexLocationsAtEnd = this.geoObject.GetVertexLocations;
+
+
+            while (returnElapsed < returnDuration)
+            {
+                float currDistance = Helpers.GetRotationProgress(returnElapsed / returnDuration, 3);
+
+                var newPos = Enumerable.Range(0, vertexLocationsAtEnd.Length)
+                    .Select(i => this.geoObject.OriginalVertexLocations[i] * currDistance + vertexLocationsAtEnd[i] * (1 - currDistance)).ToArray();
+
+                this.geoObject.SetVertexLocations(newPos);
+
+                yield return null;
+                returnElapsed += Time.deltaTime;
+            }
+
+            this.geoObject.Reset(); // reset just in case of a floating point error which might cause an angle deviation which may add up over time
 
             //var colorChange2 = ColorChange(delay: true, skipGrey: true);
             //while (colorChange2.MoveNext())

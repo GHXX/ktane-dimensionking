@@ -9,6 +9,24 @@ namespace DimensionKing
     internal class GeoObject : ScriptableObject
     {
         private List<VertexObject> VertexLocations;
+
+        internal VecNd[] OriginalVertexLocations;
+        internal VecNd[] GetVertexLocations { get { return this.VertexLocations.Select(x => x.position).ToArray(); } }
+        internal void SetVertexLocations(VecNd[] newLocations)
+        {
+            if (newLocations.Length != VertexLocations.Count)
+            {
+                throw new ArgumentException("The length of the passed vertice array is not equal to the expected length!");
+            }
+
+            for (int i = 0; i < newLocations.Length; i++)
+            {
+                VertexLocations[i].position = newLocations[i];
+            }
+
+            RecalculateMeshes();
+        }
+
         private List<EdgeObject> EdgeObjects;
         private List<FaceObject> FaceObjects;
 
@@ -65,6 +83,8 @@ namespace DimensionKing
                 this.VertexLocations[i].position = new VecNd(newVertexPositions[i].Select(x => (double)x).ToArray());
             }
 
+            this.OriginalVertexLocations = this.VertexLocations.Select(x => x.position).ToArray();
+
             DestroyExessAndCreateRequired(this.EdgeObjects, newEdgeVertexIds.Length);
             for (int i = 0; i < newEdgeVertexIds.Length; i++)
             {
@@ -80,7 +100,7 @@ namespace DimensionKing
             RecalculateMeshes();
         }
 
-        internal void SetBaseObject(Transform baseVertex, Transform baseEdge, Transform baseFace)
+        internal void SetBaseObjects(Transform baseVertex, Transform baseEdge, Transform baseFace)
         {
             this.VertexLocations = new List<VertexObject>() { new VertexObject(new VecNd()) { vertexTransform = baseVertex } };
             this.EdgeObjects = new List<EdgeObject>() {
@@ -393,6 +413,11 @@ namespace DimensionKing
             T CreateNewInstance();
 
             Transform GetTransform();
+        }
+
+        internal void Reset()
+        {
+            SetVertexLocations(OriginalVertexLocations);            
         }
     }
 }
