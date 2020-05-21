@@ -32,7 +32,7 @@ public class DimensionKingModule : MonoBehaviour
     private int[][] _colorPermutations;
     private List<bool?[]> _faces;
 
-    private static int _moduleIdCounter = 1;
+    private static int _moduleIdCounter = 0;
     private int _moduleId;
 
     private string[] _rotations;
