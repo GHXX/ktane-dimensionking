@@ -16,8 +16,6 @@ namespace DimensionKing
             //string st = vertexPositions.Select(x => x.Select(n => Math.Round(n, 4).ToString()).Join()).Join("\n");
 
             // center the vertices
-
-
             for (int dim = 0; dim < vertexPositions[0].Length; dim++) // loop all dimensions
             {
                 float min = vertexPositions[0][dim];
@@ -37,6 +35,17 @@ namespace DimensionKing
                     vertexPositions[vi][dim] -= delta;
                 }
 
+            }
+
+            // normalize vertices
+            float magnitude = vertexPositions.Max(x => new VecNd(x.Select(y => (double)y).ToArray()).Project().magnitude);
+
+            for (int i = 0; i < vertexPositions.Length; i++)
+            {
+                for (int dim2 = 0; dim2 < vertexPositions[0].Length; dim2++)
+                {
+                    vertexPositions[i][dim2] /= magnitude;
+                }
             }
 
             var s = new SchlafliStruct(vertexPositions, vertexIndexes[0], vertexIndexes[1]);
