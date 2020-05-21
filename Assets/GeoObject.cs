@@ -356,6 +356,8 @@ namespace DimensionKing
                 }
 
                 this.faceMesh.mesh.triangles = triangleIndices;
+                this.faceMesh.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                
                 this.faceMesh.mesh.RecalculateNormals();
             }
             public Transform GetTransform()
