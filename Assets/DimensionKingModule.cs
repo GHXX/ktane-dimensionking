@@ -47,6 +47,7 @@ public class DimensionKingModule : MonoBehaviour
 
     private static readonly string[] possibleShapes = "3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');//;5 3 3
     private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
+    public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes).ToArray()*/;
 
     //private static readonly string[][] _dimensionNames = new[] { 
     //                                // dim|Axis
@@ -85,7 +86,7 @@ public class DimensionKingModule : MonoBehaviour
     void Start()
     {
         this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
-        var schlafli = possibleShapes.PickRandom();
+        var schlafli = inUseShapes.PickRandom();
         //schlafli = "4 3 3";
 
         Log("Picked the following shape: {" + schlafli.Replace(' ', ',') + "}");

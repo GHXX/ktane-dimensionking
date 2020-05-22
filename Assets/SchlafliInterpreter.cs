@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DimensionKing
 {
-    static class SchlafliInterpreter // this code is a modfication of the python code suggested in this answer https://codegolf.stackexchange.com/a/167896
+    public static class SchlafliInterpreter // this code is a modfication of the python code suggested in this answer https://codegolf.stackexchange.com/a/167896
     {
         public static SchlafliStruct GetGeometryDataFromSchlafli(string[] schlafliInput)
         {
@@ -282,7 +282,7 @@ namespace DimensionKing
             }
         }
 
-        internal struct SchlafliStruct
+        public struct SchlafliStruct
         {
             public float[][] VertexLocations { get; private set; }
             public int[][] EdgeVertexIndexes { get; private set; }
