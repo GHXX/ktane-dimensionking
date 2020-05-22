@@ -35,19 +35,34 @@ public class DimensionKingModule : MonoBehaviour
     private static int _moduleIdCounter = 0;
     private int _moduleId;
 
-    private string[] _rotations;
+    private string[] rotations;
+    private string schlafli;
+    private int vertexCount;
+    private int edgeCount;
+    private int faceCount;
+
     private float _hue, _sat, _v;
     private Coroutine _rotationCoroutine;
     private bool _transitioning;
-    private int _progress;
-    private int[] _vertexColors;
-    private int _correctVertex;
+    private int solveProgress;
+    private int correctVertex;
 
-    private static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
+
+    public static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
 
     private static readonly string[] possibleShapes = "3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');//;5 3 3
     private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
-    public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes).ToArray()*/;
+    public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
+    public const int numberOfRotations = 5;
+    public static readonly string[] colorNames = "Red;Blue;Yellow;Green;Orange;Cyan;Magenta;Lime;Key;White".Split(';');
+    private static readonly Color[] colorValues = "FF0000;0000FF;FFFF00;008000;FF8000;00FFFF;FF00FF;00FF00;000000;FFFFFF".Split(';')
+        .Select(x => new Color(Convert.ToByte(x.Substring(0, 2), 16), Convert.ToByte(x.Substring(2, 2), 16), Convert.ToByte(x.Substring(4, 2), 16)))
+        .ToArray();
+
+    internal Color GetColorFromName(string name)
+    {
+        return colorValues[Array.IndexOf(colorNames, name)];
+    }
 
     //private static readonly string[][] _dimensionNames = new[] { 
     //                                // dim|Axis
@@ -62,8 +77,6 @@ public class DimensionKingModule : MonoBehaviour
     //    new[] { "this", "that" },   // 9 = R
     //    new[] { "ying", "yang" }    //10 = Q
     //};
-    private static readonly string[] _colorNames = new[] { "red", "yellow", "green", "blue" };
-    private static readonly Color[] _vertexColorValues = "e54747,e5e347,47e547,3ba0f1".Split(',').Select(str => new Color(Convert.ToInt32(str.Substring(0, 2), 16) / 255f, Convert.ToInt32(str.Substring(2, 2), 16) / 255f, Convert.ToInt32(str.Substring(4, 2), 16) / 255f)).ToArray();
 
     private int GetDimensionCount() { return this.geoObject.dimensionCount; }
     private bool hideFaces = true;
@@ -86,13 +99,13 @@ public class DimensionKingModule : MonoBehaviour
     void Start()
     {
         this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
-        var schlafli = inUseShapes.PickRandom();
-        //schlafli = "4 3 3";
+        this.schlafli = inUseShapes.PickRandom();
+        //schlafli = "3 3 3";
 
-        Log("Picked the following shape: {" + schlafli.Replace(' ', ',') + "}");
+        Log("Picked the following shape: {" + this.schlafli.Replace(' ', ',') + "}");
 
 
-        var schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(schlafli.Split(' ')); // TODO allow stuff like "5/2 3 2"
+        var schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(this.schlafli.Split(' ')); // TODO allow stuff like "5/2 3 2"
         this.geoObject = ScriptableObject.CreateInstance<GeoObject>();
         this.geoObject.SetBaseObjects(this.BaseVertex, this.BaseEdge, this.BaseFace);
 
@@ -103,21 +116,23 @@ public class DimensionKingModule : MonoBehaviour
             schlafliData.VertexLocations.Select(x => x.Select(y => y * scaleFactor).ToArray()).ToArray(), schlafliData.EdgeVertexIndexes, schlafliData.FaceVertexIndexes);
 
 
-        var relevantAxesNames = _axesNames.Take(GetDimensionCount()).ToArray();
+        string[] rotCombinations = GetRotationPermutations(GetDimensionCount());
 
-        var rotCombinations = Enumerable.Range(0, relevantAxesNames.Length)
-            .SelectMany(i => Enumerable.Range(i + 1, relevantAxesNames.Length - i - 1)
-            .Select(j => relevantAxesNames[i].ToString() + relevantAxesNames[j].ToString()))
-            .SelectMany(x => new[] { x, x[1].ToString() + x[0].ToString() }).ToArray();
+        this.rotations = Enumerable.Range(0, numberOfRotations).Select(x => rotCombinations[this.rand.Next(rotCombinations.Length)]).ToArray();
+        this.vertexCount = schlafliData.VertexLocations.Length;
+        this.edgeCount = schlafliData.EdgeVertexIndexes.Length;
+        this.faceCount = schlafliData.FaceVertexIndexes.Length;
 
-        this._rotations = Enumerable.Range(0, 5).Select(x => rotCombinations[this.rand.Next(rotCombinations.Length)]).ToArray();
+        this.geoObject.OnVertexClicked += GeoObject_OnVertexClicked;
 
-        Log("Rotations are: " + string.Join(", ", this._rotations));
-
-
+        Log("Rotations are: " + string.Join(", ", this.rotations));
 
 
 
+
+
+
+        #region OldCode
         //// setup edgeCount edges
         //var existingEdges = new List<Transform>(this.Edges);
         //for (int i = 0; i < (edgeCount - this.Edges.Count()); i++)
@@ -248,9 +263,34 @@ public class DimensionKingModule : MonoBehaviour
         //Debug.LogFormat(@"[The NCube #{0}] Rotations are: {1}", this._moduleId, this._rotations.Select(rot => this._rotationNames[rot]).Join(", "));
 
         //for (var i = 0; i < this.Vertices.Count(); i++)
-        //    this.Vertices[i].OnInteract = VertexClick(i);
+        //    this.Vertices[i].OnInteract = VertexClick(i); 
+        #endregion
 
         this._rotationCoroutine = StartCoroutine(RotateDimKing());
+    }
+
+    private void GeoObject_OnVertexClicked(object sender, VertexPressedEventArgs e)
+    {
+        var vertex = e.VertexObject;
+        Log("Clicked vertex " + e.i);
+    }
+
+    public static string[] GetRotationPermutations(int dimCount)
+    {
+        var relevantAxesNames = _axesNames.Take(dimCount).ToArray();
+
+        return Enumerable.Range(0, relevantAxesNames.Length)
+            .SelectMany(i => Enumerable.Range(i + 1, relevantAxesNames.Length - i - 1)
+            .Select(j => relevantAxesNames[i].ToString() + relevantAxesNames[j].ToString()))
+            .SelectMany(x => new[] { x, x[1].ToString() + x[0].ToString() }).ToArray();
+    }
+
+    public static int GetRotationValue(char rotchar1, char rotchar2, int dimensionCount)
+    {
+        var index1 = Array.IndexOf(_axesNames, rotchar1);
+        var index2 = Array.IndexOf(_axesNames, rotchar2);
+
+        return index1 * dimensionCount + index2;
     }
 
     //private void SetupFacesRecursively(MonoRandom rnd, int depth = 1, params int[] forloopvars) // forloopvars contains the variables dimSkip,a,b,c... of the recursive forloops
@@ -606,6 +646,44 @@ public class DimensionKingModule : MonoBehaviour
     //    this._facesMat.color = clr;
     //}
 
+    private KMSelectable.OnInteractHandler VertexClick(int v)
+    {
+        return delegate
+        {
+            //Vertices[v].AddInteractionPunch(.2f);
+            //if (_transitioning)
+            //    return false;
+
+            //if (_rotationCoroutine != null)
+            //{
+            //    _progress = 0;
+            //    StartCoroutine(ColorChange(setVertexColors: true));
+            //}
+            //else if (v == _correctVertex)
+            //{
+            //    _progress++;
+            //    if (_progress == 4)
+            //    {
+            //        Debug.LogFormat(@"[The Hypercube #{0}] Module solved.", _moduleId);
+            //        Module.HandlePass();
+            //        StartCoroutine(ColorChange(keepGrey: true));
+            //        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
+            //    }
+            //    else
+            //    {
+            //        StartCoroutine(ColorChange(setVertexColors: true));
+            //    }
+            //}
+            //else
+            //{
+            //    Debug.LogFormat(@"[The Hypercube #{0}] Incorrect vertex {1} pressed; resuming rotations.", _moduleId, StringifyShape(v));
+            //    Module.HandleStrike();
+            //    _rotationCoroutine = StartCoroutine(RotateHypercube(delay: true));
+            //}
+            return false;
+        };
+    }
+
     private IEnumerator RotateDimKing(bool delay = false)
     {
         //var colorChange = ColorChange(delay: delay);
@@ -619,9 +697,9 @@ public class DimensionKingModule : MonoBehaviour
         {
             yield return new WaitForSeconds(Rnd.Range(1.75f, 2.25f));
 
-            for (int rot = 0; rot < this._rotations.Length && !this._transitioning; rot++)
+            for (int rot = 0; rot < this.rotations.Length && !this._transitioning; rot++)
             {
-                var currRotName = this._rotations[rot];
+                var currRotName = this.rotations[rot];
 
                 var axis1 = GetCurrentAxesChars().IndexOf(currRotName[0]);
                 var axis2 = GetCurrentAxesChars().IndexOf(currRotName[1]);
@@ -675,6 +753,38 @@ public class DimensionKingModule : MonoBehaviour
 
         this._transitioning = false;
         this._rotationCoroutine = null;
+    }
+
+    private int[] GetSolveNumbers() // gets the numbers that should be entered to solve this module.
+    {
+        var retval = new List<int>();
+        if (this.rotations.Length == 0)
+        {
+            throw new InvalidOperationException("No rotations defined.");
+        }
+
+        foreach (var rot in this.rotations) // calc rot numbers Rn
+        {
+            retval.Add(GetRotationValue(rot[0], rot[1], GetDimensionCount()));
+        }
+
+        foreach (var schlafli in this.schlafli.Split(' ')) // calc schlafli numbers Sn
+        {
+            if (schlafli.Contains('/'))
+            {
+                retval.Add(schlafli.Split('/').Sum(x => int.Parse(x)));
+            }
+            else
+            {
+                retval.Add(int.Parse(schlafli));
+            }
+        }
+
+        retval.Add(this.vertexCount);
+        retval.Add(this.edgeCount);
+        retval.Add(this.faceCount);
+
+        return retval.ToArray();
     }
 
     //private static float EaseInOutQuad(float t, float start, float end, float duration)

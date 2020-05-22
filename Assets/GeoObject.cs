@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace DimensionKing
     internal class GeoObject : ScriptableObject
     {
         private List<VertexObject> VertexLocations;
+
+        internal event EventHandler<VertexPressedEventArgs> OnVertexClicked;
 
         internal VecNd[] OriginalVertexLocations;
         internal VecNd[] GetVertexLocations { get { return this.VertexLocations.Select(x => x.position).ToArray(); } }
@@ -57,6 +60,25 @@ namespace DimensionKing
             {
                 this.FaceObjects[i].vertexObjects = newFaceVertexIds[i].Select(x => this.VertexLocations[x]).ToArray();
             }
+
+            var dk = this.VertexLocations[0].vertexTransform.parent.parent;
+            var kmsel = dk.GetComponent<KMSelectable>();
+            var testSel = dk.GetComponent<TestSelectable>();
+
+            var tsel = new TestSelectable[this.VertexLocations.Count];
+            var arr = new KMSelectable[this.VertexLocations.Count];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                arr[i] = this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>();
+                tsel[i] = this.VertexLocations[i].vertexTransform.GetComponent<TestSelectable>();
+
+                this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>().OnInteract = OnVertexClickedInternal(this.VertexLocations[i], i);
+            }
+            kmsel.ChildRowLength = arr.Length;
+            kmsel.Children = arr;
+
+            testSel.ChildRowLength = tsel.Length;
+            testSel.Children = tsel;
 
             RecalculateMeshes();
         }
@@ -127,6 +149,11 @@ namespace DimensionKing
                 this.VertexLocations[i].position *= matrix;
             }
             RecalculateMeshes();
+        }
+
+        internal ReadOnlyCollection<VertexObject> GetVertexObjects()
+        {
+            return this.VertexLocations.AsReadOnly();
         }
 
         private void DestroyExessAndCreateRequired<T>(List<T> collection, int newCount) where T : IDestroyable<T>
@@ -213,6 +240,18 @@ namespace DimensionKing
 
                 return pos;
             }
+        }
+
+        private KMSelectable.OnInteractHandler OnVertexClickedInternal(VertexObject vertex, int i)
+        {
+            return delegate
+            {
+                if (this.OnVertexClicked != null)
+                {
+                    OnVertexClicked.Invoke(this, new VertexPressedEventArgs(vertex, i));
+                }
+                return false;
+            };
         }
 
         internal class EdgeObject : IDestroyable<EdgeObject>
@@ -357,7 +396,7 @@ namespace DimensionKing
 
                 this.faceMesh.mesh.triangles = triangleIndices;
                 this.faceMesh.transform.localRotation = Quaternion.Euler(0, 0, 0);
-                
+
                 this.faceMesh.mesh.RecalculateNormals();
             }
             public Transform GetTransform()
