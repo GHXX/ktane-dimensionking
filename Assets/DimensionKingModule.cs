@@ -272,6 +272,9 @@ public class DimensionKingModule : MonoBehaviour
     private void GeoObject_OnVertexClicked(object sender, VertexPressedEventArgs e)
     {
         var vertex = e.VertexObject;
+
+
+
         Log("Clicked vertex " + e.i);
     }
 
