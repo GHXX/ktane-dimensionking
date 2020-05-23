@@ -57,7 +57,7 @@ public class DimensionKingModule : MonoBehaviour
     public const int numberOfRotations = 5;
     public static readonly string[] colorNames = "Red;Blue;Yellow;Green;Orange;Cyan;Magenta;Lime;Key;White".Split(';');
     private static readonly Color[] colorValues = "FF0000;0000FF;FFFF00;008000;FF8000;00FFFF;FF00FF;00FF00;000000;FFFFFF".Split(';')
-        .Select(x => new Color(Convert.ToInt32(x.Substring(0, 2), 16), Convert.ToInt32(x.Substring(2, 2), 16), Convert.ToInt32(x.Substring(4, 2), 16)))
+        .Select(x => new Color(Convert.ToByte(x.Substring(0, 2), 16) / 255f, Convert.ToByte(x.Substring(2, 2), 16) / 255f, Convert.ToByte(x.Substring(4, 2), 16) / 255f))
         .ToArray();
     private string[] chosenColors;
     Color originalVertexColor = Color.white;
@@ -311,6 +311,7 @@ public class DimensionKingModule : MonoBehaviour
                 var sum = this.enteredNumbers.Skip(1).Sum();
                 if (sum == this.calculatedSolveNumbers[this.solveProgress])
                 {
+                    Log("Sequence correct.");
                     this.solveProgress++;
                     if (this.solveProgress == this.calculatedSolveNumbers.Length)
                     {
@@ -321,6 +322,7 @@ public class DimensionKingModule : MonoBehaviour
                 }
                 else
                 {
+                    Log("Invalid number entered!");
                     StrikeAndReset();
                 }
             }
@@ -938,9 +940,9 @@ public class DimensionKingModule : MonoBehaviour
             }
         }
 
-        retval.Add(this.vertexCount);
-        retval.Add(this.edgeCount);
-        retval.Add(this.faceCount);
+        //retval.Add(this.vertexCount);
+        //retval.Add(this.edgeCount);
+        //retval.Add(this.faceCount);
 
         return retval.ToArray();
     }
