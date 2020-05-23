@@ -240,6 +240,11 @@ namespace DimensionKing
 
                 return pos;
             }
+
+            internal KMSelectable GetKMSelectable()
+            {
+                return this.vertexTransform.GetComponent<KMSelectable>();
+            }
         }
 
         private KMSelectable.OnInteractHandler OnVertexClickedInternal(VertexObject vertex, int i)
