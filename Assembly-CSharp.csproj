@@ -64,6 +64,7 @@
     <Compile Include="Assets\KMScripts\ReadOnlyWhenPlayingAttribute.cs" />
     <Compile Include="Assets\ModuleSolveState.cs" />
     <Compile Include="Assets\SchlafliInterpreter.cs" />
+    <Compile Include="Assets\SchlafliInterpreterException.cs" />
     <Compile Include="Assets\TestHarness\EdgeworkConfiguration.cs" />
     <Compile Include="Assets\TestHarness\NeedyTimer.cs" />
     <Compile Include="Assets\TestHarness\SevenSegDisplay.cs" />

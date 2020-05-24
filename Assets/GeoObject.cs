@@ -195,17 +195,9 @@ namespace DimensionKing
             internal VecNd position;
             internal Transform vertexTransform;
 
-            private Vector3 projectedCache = new VecNd(new double[] { 0, 0, 0, 0 }).Project();
-            private VecNd projectedCachedInput = new VecNd();
             internal Vector3 ProjectTo3D()
             {
-                if (true || !this.position.ValueEquals(this.projectedCachedInput)) // TODO reenable, seems like its actually counter productive
-                                                                                   // TODO check if the cache code is actually useful in terms of cpu efficiency
-                {
-                    this.projectedCachedInput = this.position;
-                    this.projectedCache = this.position.Project();
-                }
-                return this.projectedCache;
+                return this.position.Project();
             }
 
             public VertexObject(VecNd position)

@@ -2,7 +2,7 @@
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
-    <title>The Ultracube — Keep Talking and Nobody Explodes Module</title>
+    <title>Dimension King — Keep Talking and Nobody Explodes Module</title>
     <meta content="initial-scale=1" name="viewport">
     <link rel='stylesheet' type='text/css' href='css/font.css'>
     <link rel='stylesheet' type='text/css' href='css/normalize.css'>
@@ -24,64 +24,17 @@
             border: none;
         }
     </style>
-    <script>
-        function setDefaultRules(rnd) { setRules(rnd); }
-        function setRules(rnd)
-        {
-            let faceDimensions = [
-                ['ping', 'pong'],
-                ['zig', 'zag'],
-                ['bottom', 'top'],
-                ['front', 'back'],
-                ['left', 'right']
-            ];
-
-            let faces = [];
-            for (let i = 0; i < faceDimensions.length; i++)
-                for (let j = i + 1; j < faceDimensions.length; j++)
-                    for (let k = j + 1; k < faceDimensions.length; k++)
-                    {
-                        let which1 = rnd.next(0, 2);
-                        let which2 = rnd.next(0, 2);
-                        switch (rnd.next(0, 3))
-                        {
-                            case 0:
-                                faces.push(`${faceDimensions[i][0]}-${faceDimensions[j][which1]}-${faceDimensions[k][which2]}`);
-                                faces.push(`${faceDimensions[i][1]}-${faceDimensions[j][which1]}-${faceDimensions[k][which2]}`);
-                                break;
-                            case 1:
-                                faces.push(`${faceDimensions[i][which1]}-${faceDimensions[j][0]}-${faceDimensions[k][which2]}`);
-                                faces.push(`${faceDimensions[i][which1]}-${faceDimensions[j][1]}-${faceDimensions[k][which2]}`);
-                                break;
-                            default:
-                                faces.push(`${faceDimensions[i][which1]}-${faceDimensions[j][which2]}-${faceDimensions[k][0]}`);
-                                faces.push(`${faceDimensions[i][which1]}-${faceDimensions[j][which2]}-${faceDimensions[k][1]}`);
-                                break;
-                        }
-                    }
-            rnd.shuffleFisherYates(faces);
-            let colorPermutations = rnd.shuffleFisherYates(["RYGB", "RYBG", "RGYB", "RGBY", "RBYG", "RBGY", "YRGB", "YRBG", "YGRB", "YGBR", "YBRG", "YBGR", "GRYB", "GRBY", "GYRB", "GYBR", "GBRY", "GBYR", "BRYG", "BRGY", "BYRG", "BYGR", "BGRY", "BGYR"]);
-
-            let faceTds = document.getElementsByClassName('face');
-            let orderTds = document.getElementsByClassName('order');
-            for (let i = 0; i < 20; i++)
-            {
-                faceTds[i].innerText = faces[i];
-                orderTds[i].innerText = colorPermutations[i];
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="section">
         <div class="page page-bg-03">
             <div class="page-header">
                 <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
-                <span class="page-header-section-title">The Ultracube</span>
+                <span class="page-header-section-title">Dimension King</span>
             </div>
             <div class="page-content">
                 <img class="diagram" src="img/Component/The Ultracube.svg">
-                <h2>On the Subject of The Ultracube</h2>
+                <h2>On the Subject of the Dimension King</h2>
 
                 <p class="flavour-text">Oh I know this one! Wait, it looks different... Why are there more lines now?</p>
 

@@ -8,12 +8,18 @@ namespace DimensionKing
     {
         public static SchlafliStruct GetGeometryDataFromSchlafli(string[] schlafliInput)
         {
-            var schlafliFloats = schlafliInput.Select(x => stringFractionToFloat(x)).ToArray();
+            var schlafliFloats = schlafliInput.Select(x => StringFractionToFloat(x)).ToArray();
             float[][] vertexPositions;
             List<int[][]> vertexIndexes;
 
             bool isOK = TryRegularPolytope(schlafliFloats, out vertexPositions, out vertexIndexes);
             //string st = vertexPositions.Select(x => x.Select(n => Math.Round(n, 4).ToString()).Join()).Join("\n");
+
+
+            if (!isOK)
+            {
+                throw new SchlafliInterpreterException("Unable to generate geometry object.");
+            }
 
             // center the vertices
             for (int dim = 0; dim < vertexPositions[0].Length; dim++) // loop all dimensions
@@ -160,7 +166,7 @@ namespace DimensionKing
             var dim = schlafli.Length + 1;
             if (dim == 1) return new[] { new[] { new[] { -1f, 1f } } }; // one generator, reflect about x=0.5
             var facetGenerators = CalculateSymmetryGenerators(schlafli.Take(schlafli.Length - 1).ToArray());
-            var generators = facetGenerators.Select(x => expandHomo(x)).ToList();
+            var generators = facetGenerators.Select(x => ExpandHomo(x)).ToList();
 
 
             float s;
@@ -252,7 +258,7 @@ namespace DimensionKing
             c = (float)Math.Sqrt(1 - ss);
         }
 
-        private static float[][] expandHomo(float[][] m)
+        private static float[][] ExpandHomo(float[][] m)
         {
             var m2 = new List<float[]>();
             for (int i = 0; i < m.Length; i++)
@@ -269,7 +275,7 @@ namespace DimensionKing
             return m2.ToArray();
         }
 
-        private static float stringFractionToFloat(string str)
+        private static float StringFractionToFloat(string str)
         {
             if (str.Contains('/'))
             {
