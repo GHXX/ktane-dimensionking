@@ -34,27 +34,115 @@
             </div>
             <div class="page-content">
                 <img class="diagram" src="img/Component/The Ultracube.svg">
-                <h2>On the Subject of the Dimension King</h2>
+                <h2>On the Subject of Dimension King</h2>
 
-                <p class="flavour-text">Oh I know this one! Wait, it looks different... Why are there more lines now?</p>
+                <p class="flavour-text">And you thought the nightmare would end with Ultracube...</p>
 
-                <p>Observe the sequence of five 5D rotations of the Ultracube. There is a brief pause when the sequence repeats.</p>
-                <p>From the first four rotations, obtain four Ultracube faces as listed in the <em>Face</em> column in the below table.</p>
-                <p>From the fifth rotation, obtain a sequence of colors as listed in the <em>Order</em> column in the below table.</p>
+				<p>The module shows a 4D or 5D shape, with the base shape having three to five vertices.</p>
+				<h3>Getting the info required to solve this module:</h3>
+				<p>First of all, determine the dimension count.</p>
+                <p>Then, read the sequence of five rotations of the shape. There is a quintuple rotation before the sequence restarts.</p>
+                
+                <p>From the following list of axis letters, determine the values of each axis letter, the first axis letter value being referred to as 'a', and the second as 'b':</p>
+				<p><code>X=0, Y=1, Z=2, W=3, V=4, ...</code></p>
+				<p>Now calculate the values Rn, where n is the rotation position starting at 1:</p>
+								
+				<code>Rn = a * {dimensionCount} + b</code>
+				
+				<p>Now determine the first two Schläfli numbers, S1 and S2:</p>
+				<p>The first Schläfli number specifies how many vertices are required to make up a base face.</p>
+				<p>The second Schläfli number determines how many faces enclose every vertex.</p>
 
-                <table class="ultracube-rotations">
-                    <tr><th>Rot.</th><th>Face</th><th>Order</th><td class="sep" rowspan="20"></td><th>Rot.</th><th>Face</th><th>Order</th></tr>
-                    <tr><th>XY</th><td class="face">zag-top-right</td><td class="order">RBGY</td><th>YX</th><td class="face">ping-top-back</td><td class="order">YBRG</td></tr>
-                    <tr><th>XZ</th><td class="face">top-back-right</td><td class="order">YGBR</td><th>ZX</th><td class="face">zag-front-right</td><td class="order">RBYG</td></tr>
-                    <tr><th>XW</th><td class="face">pong-top-left</td><td class="order">BRYG</td><th>WX</th><td class="face">ping-zig-back</td><td class="order">RYGB</td></tr>
-                    <tr><th>XV</th><td class="face">bottom-back-right</td><td class="order">BYRG</td><th>VX</th><td class="face">ping-zig-top</td><td class="order">YRGB</td></tr>
-                    <tr><th>YZ</th><td class="face">zig-top-back</td><td class="order">BYGR</td><th>ZY</th><td class="face">zag-top-back</td><td class="order">BGRY</td></tr>
-                    <tr><th>YW</th><td class="face">pong-back-left</td><td class="order">BRGY</td><th>WY</th><td class="face">zag-bottom-right</td><td class="order">GRYB</td></tr>
-                    <tr><th>YV</th><td class="face">zig-front-right</td><td class="order">YGRB</td><th>VY</th><td class="face">pong-top-right</td><td class="order">YRBG</td></tr>
-                    <tr><th>ZW</th><td class="face">pong-zag-right</td><td class="order">GRBY</td><th>WZ</th><td class="face">ping-bottom-back</td><td class="order">GYBR</td></tr>
-                    <tr><th>ZV</th><td class="face">ping-zig-bottom</td><td class="order">GBRY</td><th>VZ</th><td class="face">pong-zag-left</td><td class="order">RGBY</td></tr>
-                    <tr><th>WV</th><td class="face">ping-zag-back</td><td class="order">GYRB</td><th>VW</th><td class="face">pong-back-right</td><td class="order">BGYR</td></tr>
-                </table>
+
+				<h3>Submitting the calculated numbers:</h3>
+
+				<p>First of all, click any vertex. The shape will now rotate back to the original position, and then all the vertices will be colored differently.</p>
+				<p>Compare the colors the shape shows with the colors in the following table:</p>
+				
+				<div style="overflow:hidden">
+					<table style="float:left;left;margin-left:20%">
+						<tr>
+							<th>Color</th>
+							<th>Value</th>
+						</tr>
+						<tr>
+							<td style="background:#FF0000"> 
+								<b>Red</b> 
+							</td>
+							<td>0</td>
+						</tr>
+						<tr>
+							<td style="background:#0000FF"> 
+								<b style="color:white">Blue</b> 
+							</td>
+							<td>1</td>
+						</tr>
+						<tr>
+							<td style="background:#FFFF00"> 
+								<b>Yellow</b> 
+							</td>
+							<td>2</td>
+						</tr>
+						<tr>
+							<td style="background:#008000"> 
+								<b style="color:white">Green</b> 
+							</td>
+							<td>3</td>
+						</tr>
+						<tr>
+							<td style="background:#FF8000"> 
+								<b>Orange</b> 
+							</td>
+							<td>4</td>
+						</tr>
+					</table>				
+					<table style="float:right;margin-right:20%">
+						<tr>
+							<th>Color</th>
+							<th>Value</th>
+						</tr>
+					
+						<tr>
+							<td style="background:#00FFFF"> 
+								<b>Cyan</b> 
+							</td>
+							<td>5</td>
+						</tr>
+						<tr>
+							<td style="background:#FF00FF"> 
+								<b style="color:white">Magenta</b> 
+							</td>
+							<td>6</td>
+						</tr>
+						<tr>
+							<td style="background:#00FF00"> 
+								<b>Lime</b> 
+							</td>
+							<td>7</td>
+						</tr>
+						<tr>
+							<td style="background:#000000"> 
+								<b style="color:white">Key</b> 
+							</td>
+							<td>8</td>
+						</tr>
+						<tr>
+							<td style="background:#FFFFFF"> 
+								<b>White</b> 
+							</td>
+							<td>9</td>
+						</tr>
+					</table>
+				</div>
+				
+				
+				<p>The lowest value in the table, which is also present on the shape got a value of 0. The next color present on the cube got a value of 1 and so on.</p>
+				<p>Once the values of the colors are determined, the solution can be submitted.</p>
+				<p>The following numbers need to be submitted in this order: R1 R2 R3 R4 R5 S1 S2</p>
+				<p>The first clicked color determines the amount of additional numbers that are going to be entered. Once a whole sequence is entered, the sum of all numbers except for the first one is taken and submitted.</p>
+				<p>This sum has to be equal to the number that should be inputted. Otherwise a strike will be incurred.</p>
+
+				<p>Once all the numbers are entered, the module is solved.</p>
 
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:7cm;float:right" viewBox="-5 -6 127 120"><defs><marker id="a" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.1" d="M-10 0l-4 4L0 0l-14-4z"/></marker><marker id="b" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.1" d="M10 0l4-4L0 0l14 4z"/></marker><marker id="e" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.1" d="M-10 0l-4 4L0 0l-14-4z"/></marker><marker id="f" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.1" d="M10 0l4-4L0 0l14 4z"/></marker><marker id="c" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.1" d="M-10 0l-4 4L0 0l-14-4z"/></marker><marker id="d" orient="auto" overflow="visible"><path fill="#a0a0a0" fill-rule="evenodd" stroke="#a0a0a0" stroke-width="1.1" d="M10 0l4-4L0 0l14 4z"/></marker></defs><path fill="#d2d2d2" stroke="#000" stroke-linecap="round" stroke-width=".5" d="M100 21.5a7.5 7.5 0 0 1-7.5 7.5 7.5 7.5 0 0 1-7.5-7.5 7.5 7.5 0 0 1 7.5-7.5 7.5 7.5 0 0 1 7.5 7.5zM20 14v80h80V34a20 20 0 0 1-20-20z" /><path fill="none" stroke="#000" d="M97.5 16.5v40"/><path fill="none" stroke="#a0a0a0" marker-end="url(#a)" marker-start="url(#b)" d="M115 39L5 94"/><path fill="none" stroke="#000" d="M22.5 91.5v-40m70 25l5-20"/><path fill="none" stroke="#a0a0a0" marker-end="url(#c)" marker-start="url(#d)" d="M117.5 69H2.5"/><path fill="none" stroke="#000" d="M92.5 36.5v40"/><text x="13.4" y="57.9" font-family="Special Elite" font-size="6.7" font-weight="400" text-anchor="end"><tspan x="13.4" y="57.9">−X</tspan> <tspan x="13.4" y="63.9">left</tspan></text><text x="102.5" y="56.6" font-family="Special Elite" font-size="6.7" font-weight="400"><tspan x="102.5" y="56.6">+X</tspan> <tspan x="102.5" y="62.6">right</tspan></text><text x="54.4" y="1.9" font-family="Special Elite" font-size="6.7" font-weight="400" text-anchor="end"><tspan x="54.4" y="1.9">+Z</tspan> <tspan x="54.4" y="7.9">back</tspan></text><text x="64.7" y="104.8" font-family="Special Elite" font-size="6.7" font-weight="400"><tspan x="64.7" y="104.8">−Z</tspan> <tspan x="64.7" y="110.8">front</tspan></text><text x="37.5" y="99.9" font-family="Special Elite" font-size="6.7" font-weight="400" text-anchor="end"><tspan x="12.5" y="99.9">−W</tspan> <tspan x="12.5" y="105.9">zig</tspan></text><path fill="none" stroke="#a0a0a0" marker-end="url(#a)" marker-start="url(#b)" d="M75-3.5l-28.8 115"/><text x="43.3" y="102.1" font-family="Special Elite" font-size="6.7" font-weight="400" text-anchor="end"><tspan x="43.3" y="103.1">−V</tspan> <tspan x="43.3" y="109.1">ping</tspan></text><text x="66" y="-.1" font-family="Special Elite" font-size="6.7" font-weight="400"><tspan x="77.9" y="1.9">+V</tspan> <tspan x="77.9" y="8.9">pong</tspan></text><text x="117.5" y="26.1" font-family="Special Elite" font-size="6.7" font-weight="400" text-anchor="end"><tspan x="117.5" y="29.1">+W</tspan> <tspan x="117.5" y="35.1">zag</tspan></text><path fill="none" stroke="#000" d="M92.5 36.5l5-20m-35 35l5-20m-5 60l5-20m-15 5l5-20m-5-20l5-20m-35 75l5-20m-5-20l5-20m0 40v-40m40 0v40m30-55l-30 15m-10-15v40m0-40h40"/><path fill="none" stroke="#a0a0a0" marker-end="url(#e)" marker-start="url(#f)" d="M60-3.5v115"/><path fill="none" stroke="#000" stroke-linecap="round" d="M67.5 71.5h-40m40-40h-40m70 25h-40m-30 15l30-15m0-40l-30 15m70 25l-30 15m-5-20v40m30-55l-30 15m-10-15v40m10-25h-40m40 40h-40m30-55h40m0 40h-40m-30 15l30-15m0-40l-30 15m70 25l-30 15"/></svg>
 
