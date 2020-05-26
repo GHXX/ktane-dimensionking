@@ -29,9 +29,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 453294}
-  - component: {fileID: 3359064}
   - component: {fileID: 2373828}
   - component: {fileID: 114000013758526718}
+  - component: {fileID: 33892447521875118}
   m_Layer: 0
   m_Name: ComponentBackground
   m_TagString: Untagged
@@ -162,13 +162,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &3359064
-MeshFilter:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 138222}
-  m_Mesh: {fileID: 4300002, guid: 57bf7933dbd463449b015d2b27a1c328, type: 3}
 --- !u!33 &3398350
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -610,6 +603,13 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1269512344279836}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!33 &33892447521875118
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 138222}
+  m_Mesh: {fileID: 4300000, guid: 57bf7933dbd463449b015d2b27a1c328, type: 3}
 --- !u!114 &114000013758526718
 MonoBehaviour:
   m_ObjectHideFlags: 1
