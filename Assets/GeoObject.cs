@@ -63,22 +63,17 @@ namespace DimensionKing
 
             var dk = this.VertexLocations[0].vertexTransform.parent.parent;
             var kmsel = dk.GetComponent<KMSelectable>();
-            var testSel = dk.GetComponent<TestSelectable>();
 
-            var tsel = new TestSelectable[this.VertexLocations.Count];
             var arr = new KMSelectable[this.VertexLocations.Count];
             for (int i = 0; i < arr.Length; i++)
             {
                 arr[i] = this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>();
-                tsel[i] = this.VertexLocations[i].vertexTransform.GetComponent<TestSelectable>();
 
                 this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>().OnInteract = OnVertexClickedInternal(this.VertexLocations[i], i);
             }
             kmsel.ChildRowLength = arr.Length;
             kmsel.Children = arr;
-
-            testSel.ChildRowLength = tsel.Length;
-            testSel.Children = tsel;
+            kmsel.UpdateChildren();
 
             RecalculateMeshes();
         }
