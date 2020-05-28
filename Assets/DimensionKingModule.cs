@@ -10,7 +10,7 @@ using UnityEngine;
 using Rnd = UnityEngine.Random;
 
 /// <summary>
-/// On the Subject of The NCube
+/// The Dimension King
 /// Based on the Hyper and Ultracube created by Timwi
 /// </summary>
 public class DimensionKingModule : MonoBehaviour
@@ -82,7 +82,7 @@ public class DimensionKingModule : MonoBehaviour
         return 2 * GetVertexAndOtherCount(dimensionCount_n - 1, faceDimension_m) + GetVertexAndOtherCount(dimensionCount_n - 1, faceDimension_m - 1);
     }
 
-    [SuppressMessage("Codequalität", "IDE0051:Remove unused private members", Justification = "Called by Unity.")]
+    [SuppressMessage("Codequality", "IDE0051:Remove unused private members", Justification = "Called by Unity.")]
     void Start()
     {
         this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
@@ -102,6 +102,7 @@ public class DimensionKingModule : MonoBehaviour
         catch (SchlafliInterpreterException)
         {
             this.Module.HandlePass();
+            return;
         }
 
         this.geoObject = ScriptableObject.CreateInstance<GeoObject>();
