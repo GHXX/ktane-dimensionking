@@ -418,6 +418,25 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 11429752, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
+      propertyPath: ModuleDisplayName
+      value: Dimension King
+      objectReference: {fileID: 0}
+    - target: {fileID: 23748490253477078, guid: b2790258749f3b748b3609d36dbd9bc2,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 23009031826852794, guid: b2790258749f3b748b3609d36dbd9bc2,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 23012960752849876, guid: b2790258749f3b748b3609d36dbd9bc2,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b2790258749f3b748b3609d36dbd9bc2, type: 2}
   m_IsPrefabParent: 0

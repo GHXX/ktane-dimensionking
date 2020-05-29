@@ -31,7 +31,7 @@ public class DimensionKingModule : MonoBehaviour
 
     private static int _moduleIdCounter = 0;
     private int _moduleId;
-
+    private int randRot;
     private string[] rotations;
     private string schlafli;
     private int vertexCount;
@@ -86,6 +86,9 @@ public class DimensionKingModule : MonoBehaviour
     void Start()
     {
         this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
+        this.randRot = Rnd.Range(0, 4) * 90; // either 0, 90, 180, 270 degrees
+        Log("Module rotation angle is " + this.randRot + (this.randRot == 0 ? "." : ". This will be fun :)"));
+
         this.originalVertexColor = this.BaseVertex.GetComponent<MeshRenderer>().material.color;
 
         this.schlafli = inUseShapes.PickRandom();
@@ -125,6 +128,15 @@ public class DimensionKingModule : MonoBehaviour
         Log("Rotations are: " + string.Join(", ", this.rotations));
 
         this._rotationCoroutine = StartCoroutine(RotateDimKing());
+    }
+
+    void Update()
+    {
+        if (this.randRot != 0)
+        {
+            this.transform.localRotation = Quaternion.Euler(this.transform.localRotation.eulerAngles.x, this.randRot, this.transform.localRotation.eulerAngles.z);
+            this.randRot = 0;
+        }
     }
 
     private void GeoObject_OnVertexClicked(object sender, VertexPressedEventArgs e)
