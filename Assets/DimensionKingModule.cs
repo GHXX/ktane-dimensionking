@@ -404,7 +404,7 @@ public class DimensionKingModule : MonoBehaviour
             retval.Add(GetRotationValue(rot[0], rot[1], GetDimensionCount()));
         }
 
-        foreach (var schlafli in this.schlafli.Split(' ')) // calc schlafli numbers Sn
+        foreach (var schlafli in this.schlafli.Split(' ').Take(2)) // calc schlafli numbers Sn
         {
             if (schlafli.Contains('/'))
             {
