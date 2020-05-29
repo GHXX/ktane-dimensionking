@@ -131,11 +131,13 @@ public class DimensionKingModule : MonoBehaviour
     {
         Log("Clicked vertex " + e.i);
 
+        this.Audio.PlaySoundAtTransform("Bleep" + new[] { 3, 4, 6 }.PickRandom(), this.transform);
         e.VertexObject.GetKMSelectable().AddInteractionPunch(0.2f);
 
         //Vertices[v].AddInteractionPunch(.2f);
         //if (_transitioning)
         //    return false;
+
 
         if (this.moduleState == ModuleSolveState.Rotating)
         {
@@ -151,12 +153,14 @@ public class DimensionKingModule : MonoBehaviour
             var val = Array.IndexOf(this.chosenColors, pressedColor);
             this.enteredNumbers.Add(val);
             var nums = this.enteredNumbers[0];
+            var currentNumberSum = this.enteredNumbers.Skip(1).Sum();
+
             Log("The following number was entered: " + val + ". There are/is " + (this.enteredNumbers[0] - (this.enteredNumbers.Count - 1)) + " number(s) left to be entered.");
+            Log(currentNumberSum + (this.enteredNumbers[0] - (this.enteredNumbers.Count - 1)) * (this.chosenColors.Length - 1) + " >= " + this.calculatedSolveNumbers[this.solveProgress]);
 
             if (this.enteredNumbers.Count == nums + 1) // all numbers have been entered.
             {
-                var sum = this.enteredNumbers.Skip(1).Sum();
-                if (sum == this.calculatedSolveNumbers[this.solveProgress])
+                if (currentNumberSum == this.calculatedSolveNumbers[this.solveProgress])
                 {
                     Log("Sequence correct.");
                     this.solveProgress++;
@@ -173,10 +177,19 @@ public class DimensionKingModule : MonoBehaviour
                     StrikeAndReset();
                 }
             }
-            else if (this.enteredNumbers.Skip(1).Sum() > this.calculatedSolveNumbers[this.solveProgress])
+            else if (currentNumberSum > this.calculatedSolveNumbers[this.solveProgress])
             {
                 Log("The sum of the entered numbers " + this.enteredNumbers[0] + ", [" + this.enteredNumbers.Skip(1).Join(" ") + "] is " +
-                    this.enteredNumbers.Skip(1).Sum() + " which is bigger than the correct number " + this.calculatedSolveNumbers[this.solveProgress] + " already, meaning that it cannot be solvedd anymore.\n");
+                    currentNumberSum + " which is bigger than the correct number " + this.calculatedSolveNumbers[this.solveProgress] + " already, meaning that it cannot be solved anymore.\n");
+                StrikeAndReset();
+            }
+            else if (currentNumberSum // if currently entered number sum + (numbers left to enter)*maxNumberValue, so the currently maximum enterable number ...
+                + (this.enteredNumbers[0] - (this.enteredNumbers.Count - 1)) * (this.chosenColors.Length - 1)
+                < this.calculatedSolveNumbers[this.solveProgress]) // ... is less than the required, then strike
+            {
+                Log("The sum of the entered numbers " + this.enteredNumbers[0] + ", [" + this.enteredNumbers.Skip(1).Join(" ") + "] is " + currentNumberSum + ". " +
+                    "If you add " + ((this.enteredNumbers[0] - (this.enteredNumbers.Count - 1)) * (this.chosenColors.Length - 1)) + ", which is what you could enter at most, " +
+                    "then the resulting value is smaller than " + this.calculatedSolveNumbers[this.solveProgress] + ", meaning that it cannot be solved anymore.\n");
                 StrikeAndReset();
             }
         }
@@ -224,7 +237,7 @@ public class DimensionKingModule : MonoBehaviour
             vo[i].vertexTransform.GetComponent<MeshRenderer>().material.color = this.originalVertexColor;
         }
 
-        StartCoroutine(RotateDimKing());
+        this._rotationCoroutine = StartCoroutine(RotateDimKing());
     }
 
     private IEnumerator RotatingToPreSolve()
@@ -244,7 +257,7 @@ public class DimensionKingModule : MonoBehaviour
         {
             var c = i < this.chosenColors.Length ? this.chosenColors[i] : this.chosenColors.PickRandom();
             vo[i].vertexTransform.GetComponent<MeshRenderer>().material.color = GetColorFromName(c);
-            Log("Assigned color " + c + " with a value of " + GetColorFromName(c).ToString());
+            //Log("Assigned color " + c + " with a value of " + GetColorFromName(c).ToString());
         }
 
         this.calculatedSolveNumbers = GetSolveNumbers();
@@ -409,41 +422,143 @@ public class DimensionKingModule : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} go [use when ultracube is rotating] | !{0} pong-zig-bottom-front-left [presses a vertex when the ncube is not rotating]";
+    private readonly string TwitchHelpMessage = @"!{0} go [use to begin entering the solution] | !{0} press color1 color2 color3 [clicks vertices with those colors, in that order, accepts any args, also allows only entering the first letter of the color]";
 #pragma warning restore 414
 
-    //IEnumerator ProcessTwitchCommand(string command)
-    //{
-    //    if (this._rotationCoroutine != null && Regex.IsMatch(command, @"^\s*(go|activate|stop|run|start|on|off)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-    //    {
-    //        yield return null;
-    //        yield return new[] { this.Vertices[0] };
-    //        yield break;
-    //    }
+    IEnumerator ProcessTwitchCommand(string commandText)
+    {
+        var splitted = commandText.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        var cmd = splitted[0];
+        var args = splitted.Skip(1).ToArray();
 
-    //    Match m;
-    //    if (this._rotationCoroutine == null && (m = Regex.Match(command, string.Format(@"^\s*((?:{0})(?:[- ,;]*(?:{0}))*)\s*$", _dimensionNames.SelectMany(x => x).Join("|")), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
-    //    {
-    //        var elements = m.Groups[1].Value.Split(new[] { ' ', ',', ';', '-' }, StringSplitOptions.RemoveEmptyEntries);
-    //        if (elements.Length != 5)
-    //        {
-    //            yield return "sendtochaterror Dude, it’s a 5D ultracube, you gotta have 5 dimensions.";
-    //            yield break;
-    //        }
-    //        var dimensions = elements.Select(el => _dimensionNames.ToList().FindIndex(d => d.Any(dn => dn.EqualsIgnoreCase(el)))).ToArray();
-    //        var invalid = Enumerable.Range(0, 4).SelectMany(i => Enumerable.Range(i + 1, 4 - i).Where(j => dimensions[i] == dimensions[j]).Select(j => new { i, j })).FirstOrDefault();
-    //        if (invalid != null)
-    //        {
-    //            yield return elements[invalid.i].EqualsIgnoreCase(elements[invalid.j])
-    //                ? string.Format("sendtochaterror Dude, you wrote “{0}” twice.", elements[invalid.i], elements[invalid.j])
-    //                : string.Format("sendtochaterror Dude, “{0}” and “{1}” doesn’t jive.", elements[invalid.i], elements[invalid.j]);
-    //            yield break;
-    //        }
-    //        var vertexIx = 0;
-    //        for (int i = 0; i < 5; i++)
-    //            vertexIx |= _dimensionNames[dimensions[i]].ToList().FindIndex(dn => dn.EqualsIgnoreCase(elements[i])) << dimensions[i];
-    //        yield return null;
-    //        yield return new[] { this.Vertices[vertexIx] };
-    //    }
-    //}
+
+        if (cmd == "go") // if its the command to stop rotations
+        {
+            if (this._rotationCoroutine != null) // and rotating
+            {
+                yield return null;
+                yield return new[] { this.BaseVertex.GetComponent<KMSelectable>() };
+                yield break;
+            }
+        }
+        else if (cmd == "press")
+        {
+            if (this._rotationCoroutine == null) // and not rotating
+            {
+                var parsedColors = new List<string>(); // stores the first letter of every color to click
+
+                for (int i = 0; i < args.Length; i++)
+                {
+                    var colorArg = args[i];
+                    string color = colorNames.FirstOrDefault(x => (colorArg.Length == 1 ? x.Substring(0, 1) : x).Equals(colorArg, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (color == null)
+                    {
+                        yield return "sendtochaterror The color '" + colorArg + "' was not found!";
+                        yield break;
+                    }
+
+                    if (this.chosenColors.Contains(color))
+                    {
+                        parsedColors.Add(color);
+                    }
+                    else
+                    {
+                        yield return "sendtochaterror The chosen color '" + colorArg + "' is not present!"; // TODO maybe cause a strike?
+                        yield break;
+                    }
+                }
+
+                if (!parsedColors.Any())
+                {
+                    yield return "sendtochaterror You need to enter one or more colors after the 'press' command!";
+                    yield break;
+                }
+
+                var vertexCopy = this.geoObject.GetVertexObjects();
+                var KmSelByChar = this.chosenColors.ToDictionary(x =>
+                    x.ToLowerInvariant()[0],
+                    x => vertexCopy.First(y => y.GetTransform().GetComponent<MeshRenderer>().material.color == GetColorFromName(x)).GetKMSelectable()
+                );
+
+                var verticesToClick = parsedColors.Select(x => KmSelByChar[x.ToLowerInvariant()[0]]).ToArray();
+
+                yield return null;
+                yield return verticesToClick;
+            }
+        }
+    }
+
+    private IEnumerator InteractWithKmSelectables(IEnumerator enumerator)
+    {
+        while (enumerator.MoveNext())
+        {
+            var res = enumerator.Current;
+            if (res is KMSelectable)
+            {
+                ((KMSelectable)res).OnInteract();
+                yield return null;
+            }
+            else if (res is IEnumerable<KMSelectable>)
+            {
+                var collection = (IEnumerable<KMSelectable>)res;
+                foreach (var item in collection)
+                {
+                    item.OnInteract();
+                    yield return null;
+                }
+            }
+        }
+    }
+
+    private IEnumerator ProperTPCommand(string command)
+    {
+        yield return InteractWithKmSelectables(ProcessTwitchCommand(command));
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (this._rotationCoroutine != null)
+        {
+            yield return ProperTPCommand("go");
+            int failsafeCounter = 15;
+
+            while (this._rotationCoroutine != null && (failsafeCounter-- > 0))
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
+
+            if (failsafeCounter <= 0)
+            {
+                Log("Warning: failsafe counter is " + failsafeCounter);
+            }
+        }
+
+        for (int i = this.solveProgress; i < this.calculatedSolveNumbers.Length; i++)
+        {
+            var currSn = this.calculatedSolveNumbers[i];
+
+            if (!this.enteredNumbers.Any())
+            {
+                yield return new WaitForSeconds(0.25f);
+                yield return ProperTPCommand("press " + this.chosenColors[(int)Math.Ceiling(currSn / (this.chosenColors.Length - 1f))]);
+            }
+
+            var colorsToPress = new List<string>();
+
+            int sum = this.enteredNumbers.Skip(1).Sum();
+
+            for (int j = this.enteredNumbers.Count - 1; j < this.enteredNumbers[0]; j++)
+            {
+                var currValue = Math.Min(this.chosenColors.Length - 1, currSn - sum);
+
+                colorsToPress.Add(this.chosenColors[currValue].Substring(0, 1));
+
+                sum += currValue;
+            }
+
+            yield return null;
+            yield return ProperTPCommand("press " + colorsToPress.Join(" "));
+        }
+    }
 }
