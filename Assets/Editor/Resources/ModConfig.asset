@@ -17,8 +17,9 @@ MonoBehaviour:
     you!\n(Please be aware that this module is very difficult if you are not familiar
     with 4 dimensional and higher rotations)\n\nThe module shows a shape which got
     more than 3 dimensions. This shape is projected into 3d space and rotates along
-    its axes.\nFind out the rotations, and the first two numbers of the Schl\xE4fli-notation
-    and submit the solution by pressing the correct vertices.\n\nManual: https://ktane.timwi.de/HTML/Dimension%20King.html"
+    its axes.\nRead the rotations, and figure out the first two numbers of the Schl\xE4fli-notation
+    and submit the solution by pressing the correct vertices.\n\nManual: https://ktane.timwi.de/HTML/Dimension%20King.html\nThis
+    module is based on Hypercube and Ultracube, both made by Timwi."
   version: 1.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 45217bf8775c3ba49a5ace0ffa23de03, type: 3}
