@@ -100,7 +100,7 @@ public class DimensionKingModule : MonoBehaviour
 
         try
         {
-            schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(this.schlafli.Split(' ')); // TODO allow stuff like "5/2 3 2"
+            schlafliData = SchlafliInterpreter.GetGeometryDataFromSchlafli(this.schlafli.Split(' '));
         }
         catch (SchlafliInterpreterException)
         {
@@ -359,7 +359,6 @@ public class DimensionKingModule : MonoBehaviour
                 if (!this._transitioning)
                     yield return new WaitForSeconds(Rnd.Range(.5f, .6f));
             }
-            // TODO make it return all vertices to the start. Just linearly :)
 
             var returnDuration = 2f;
             var returnElapsed = 0f;
@@ -423,11 +422,6 @@ public class DimensionKingModule : MonoBehaviour
         return retval.ToArray();
     }
 
-    private void LogFormat(string text, params string[] args)
-    {
-        Debug.LogFormat("[DimensionKing #" + this._moduleId + "] " + text, args);
-    }
-
     private void Log(string text)
     {
         Debug.Log("[DimensionKing #" + this._moduleId + "] " + text);
@@ -476,7 +470,7 @@ public class DimensionKingModule : MonoBehaviour
                     }
                     else
                     {
-                        yield return "sendtochaterror The chosen color '" + colorArg + "' is not present!"; // TODO maybe cause a strike?
+                        yield return "sendtochaterror The chosen color '" + colorArg + "' is not present!";
                         yield break;
                     }
                 }

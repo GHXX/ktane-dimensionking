@@ -13,8 +13,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: DimensionKing
   title: Dimension King
-  description: If you think Ultracube and UltraStores are easy, this module is for
-    you!
+  description: "If you think Ultracube and UltraStores are easy, this module is for
+    you!\n\nThe module shows a shape which got more than 3 dimensions. This shape
+    is projected into 3d space and rotates along its axes.\nFind out the rotations,
+    and the first two numbers of the Schl\xE4fli-notation and submit the solution
+    by pressing the correct vertices.\n\nManual: https://ktane.timwi.de/HTML/Dimension%20King.html"
   version: 1.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 45217bf8775c3ba49a5ace0ffa23de03, type: 3}
