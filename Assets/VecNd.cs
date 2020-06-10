@@ -67,7 +67,7 @@ namespace DimensionKing
 
         public Vector3 Project()
         {
-            var retval = new Vector3((float)this.Components[0], (float)this.Components[1], (float)this.Components[2]);
+            var retval = new Vector3(this.Components.Length > 0 ? (float)this.Components[0] : 0, this.Components.Length > 1 ? (float)this.Components[1] : 0, this.Components.Length > 2 ? (float)this.Components[2] : 0);
             for (int dim = 0; dim < this.NonXyzVectors.Length; dim++)
             {
                 retval += (float)this.Components[dim + 3] * this.NonXyzVectors[dim];

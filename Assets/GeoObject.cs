@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -68,7 +69,7 @@ namespace DimensionKing
             for (int i = 0; i < arr.Length; i++)
             {
                 arr[i] = this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>();
-
+                //arr[i].Highlight = arr[0].Highlight;
                 this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>().OnInteract = OnVertexClickedInternal(this.VertexLocations[i], i);
             }
             kmsel.ChildRowLength = arr.Length;
@@ -95,6 +96,66 @@ namespace DimensionKing
                 }
             };
         }
+
+        internal IEnumerator PhaseToNewObjectAndSetMaterialColor(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds, Color newVertexColor)
+        {
+            var returnDurationA = 2f;
+            var returnElapsedA = 0f;
+
+            var currVertPositions = this.GetVertexLocations;
+
+            var zeroVecNd = new VecNd(new double[currVertPositions[0].Components.Length]);
+            var newVertPositionsA = Enumerable.Range(0, currVertPositions.Length).Select(x => zeroVecNd).ToArray();
+
+
+            while (returnElapsedA < returnDurationA)
+            {
+                float currDistance = Helpers.GetRotationProgress(returnElapsedA / returnDurationA, 3);
+
+                var newPos = Enumerable.Range(0, currVertPositions.Length)
+                    .Select(i => newVertPositionsA[i] * currDistance + currVertPositions[i] * (1 - currDistance)).ToArray();
+
+                SetVertexLocations(newPos);
+
+                yield return null;
+                returnElapsedA += Time.deltaTime;
+            }
+
+            yield return null;
+
+            LoadVerticesEdgesAndFaces(newVertexPositions.Select(x => new float[x.Length]).ToArray(), newEdgeVertexIds, newFaceVertexIds);
+
+            IList<VertexObject> verts = this.GetVertexObjects();
+            for (int i = 0; i < verts.Count; i++)
+            {
+                verts[i].GetTransform().GetComponent<MeshRenderer>().material.color = newVertexColor;
+            }
+
+            yield return null;
+
+            var returnDurationB = 2f;
+            var returnElapsedB = 0f;
+
+            var newVecNdVertexPositionsB = newVertexPositions.Select(x => new VecNd(x.Select(a => (double)a).ToArray())).ToArray();
+            var zeroVecNdB = new VecNd(new double[newVecNdVertexPositionsB[0].Components.Length]);
+            var oldVertPositionsB = Enumerable.Range(0, newVecNdVertexPositionsB.Length).Select(x => zeroVecNdB).ToArray();
+
+            while (returnElapsedB < returnDurationB)
+            {
+                float currDistance = Helpers.GetRotationProgress(returnElapsedB / returnDurationB, 3);
+
+                var newPos = Enumerable.Range(0, oldVertPositionsB.Length)
+                    .Select(i => newVecNdVertexPositionsB[i] * currDistance + oldVertPositionsB[i] * (1 - currDistance)).ToArray();
+
+                SetVertexLocations(newPos);
+
+                yield return null;
+                returnElapsedB += Time.deltaTime;
+            }
+
+            yield return null;
+        }
+
 
         private void RecalculateMeshes()
         {
@@ -159,12 +220,24 @@ namespace DimensionKing
 
                 for (int i = 0; i < delCount; i++)
                 {
-                    collection[collection.Count - 1].Destroy();
-                    collection.RemoveAt(collection.Count - 1);
+                    if (collection.Count - 1 == 0)
+                    {
+                        collection[0].GetTransform().GetComponent<MeshRenderer>().enabled = false; // if its the last one, disable it instead of deleting it
+                    }
+                    else
+                    {
+                        collection[collection.Count - 1].Destroy();
+                        collection.RemoveAt(collection.Count - 1);
+                    }
                 }
             }
             else if (newCount > collection.Count)
             {
+                if (collection.Count == 1)
+                {
+                    collection[0].GetTransform().GetComponent<MeshRenderer>().enabled = true; // reenable the previously disabled meshrenderer
+                }
+
                 int addCount = newCount - collection.Count;
                 for (int i = 0; i < addCount; i++)
                 {
@@ -207,7 +280,7 @@ namespace DimensionKing
 
             void IDestroyable<VertexObject>.Destroy()
             {
-                Destroy(this.vertexTransform);
+                Destroy(this.vertexTransform.gameObject);
             }
 
             VertexObject IDestroyable<VertexObject>.CreateNewInstance()
@@ -270,7 +343,7 @@ namespace DimensionKing
 
             void IDestroyable<EdgeObject>.Destroy()
             {
-                Destroy(this.edgeMesh);
+                Destroy(this.edgeMesh.gameObject);
             }
 
             EdgeObject IDestroyable<EdgeObject>.CreateNewInstance()
@@ -333,7 +406,7 @@ namespace DimensionKing
 
             void IDestroyable<FaceObject>.Destroy()
             {
-                Destroy(this.faceMesh);
+                Destroy(this.faceMesh.gameObject);
             }
 
             FaceObject IDestroyable<FaceObject>.CreateNewInstance()

@@ -181,8 +181,8 @@ public class DimensionKingModule : MonoBehaviour
                     this.solveProgress++;
                     if (this.solveProgress == this.calculatedSolveNumbers.Length)
                     {
-                        this.Module.HandlePass();
                         this.moduleState = ModuleSolveState.Solved;
+                        StartCoroutine(SolvedAnimation());
                     }
                     this.enteredNumbers.Clear();
                 }
@@ -391,6 +391,101 @@ public class DimensionKingModule : MonoBehaviour
 
         this._transitioning = false;
         this._rotationCoroutine = null;
+    }
+
+    private IEnumerator SolvedAnimation()
+    {
+        float checkmarkWidth = 0.4f;
+
+
+        //var checkmarkShapeList = new List<float[]> {
+        //    new[] { 0f, 0, 0.2f }, new[] { 0.6f, 0, 0f }, new[] { 0.6f, 0, 2f },
+        //    new[] { 1f, 0, 2f }, new[] { 0.7f+0.58f/5+0.3f, 0, /*-1.2f-2.8f/5*/ -0.4f }, new[]{ 0f, 0, -0.2f }
+        //};
+        var checkmarkShapeList = new List<float[]> {
+            //     RIGHT, 0, UP
+            new[] { -0.7f, 0, 0.85f }, new[] { 0f, 0, 0.35f }, new[] { 0, 0, 2f },
+            new[] { checkmarkWidth, 0, 2f }, new[] { checkmarkWidth, 0,-checkmarkWidth}, new[]{ -0.7f, 0, 0.85f- checkmarkWidth }
+        };
+        var edgeIndices = Enumerable.Range(0, checkmarkShapeList.Count - 1).Select(x => new[] { x, x + 1 }).ToList();
+
+        var itemsToClone = checkmarkShapeList.Count;
+        for (int i = 0; i < itemsToClone; i++)
+        {
+            var f = checkmarkShapeList[i].ToArray();
+            f[1] = 1;
+            checkmarkShapeList.Add(f);
+
+            if (i > 0)
+            {
+                edgeIndices.Add(new[] { itemsToClone + i - 1, itemsToClone + i });
+            }
+        }
+
+        var checkmarkShape = checkmarkShapeList.ToArray();
+
+
+        yield return this.geoObject.PhaseToNewObjectAndSetMaterialColor(checkmarkShape, edgeIndices.ToArray(), new int[][] { }, Color.green);
+        this.geoObject.OriginalVertexLocations = this.geoObject.GetVertexLocations;
+
+        //this.Module.HandlePass(); // TODO uncomment
+
+        while (this.Bomb.IsBombPresent()) // TODO check if this properly ends the subroutine when the bomb is solved / exploded.
+        {
+            yield return new WaitForSeconds(Rnd.Range(0.75f, 1f));
+
+            var cmrots = this.rotations.Shuffle().Take(5).ToArray();
+            var cmrotsMult = Enumerable.Range(0, cmrots.Length).Select(x => Rnd.Range(0.5f, 3f)).ToArray();
+
+
+            for (int rot = 0; rot < this.rotations.Length && !this._transitioning; rot++)
+            {
+                var currRotName = cmrots[rot];
+
+                var axis1 = GetCurrentAxesChars().IndexOf(currRotName[0]);
+                var axis2 = GetCurrentAxesChars().IndexOf(currRotName[1]);
+                var duration = 2f * cmrotsMult[rot];
+                var elapsed = 0f;
+
+                float rotationDone = 0f;
+
+                while (elapsed < duration)
+                {
+                    float currRot = Helpers.GetRotationProgress(elapsed / duration, 3) * 1;
+                    float delta = Math.Max(0, currRot - rotationDone);
+                    rotationDone += delta;
+
+                    this.geoObject.Rotate(axis1, axis2, delta);
+
+                    yield return null;
+                    elapsed += Time.deltaTime;
+                }
+
+                if (!this._transitioning)
+                    yield return new WaitForSeconds(Rnd.Range(.2f, .3f));
+            }
+
+            var returnDuration = 2f;
+            var returnElapsed = 0f;
+
+            var vertexLocationsAtEnd = this.geoObject.GetVertexLocations;
+
+
+            while (returnElapsed < returnDuration)
+            {
+                float currDistance = Helpers.GetRotationProgress(returnElapsed / returnDuration, 3);
+
+                var newPos = Enumerable.Range(0, vertexLocationsAtEnd.Length)
+                    .Select(i => this.geoObject.OriginalVertexLocations[i] * currDistance + vertexLocationsAtEnd[i] * (1 - currDistance)).ToArray();
+
+                this.geoObject.SetVertexLocations(newPos);
+
+                yield return null;
+                returnElapsed += Time.deltaTime;
+            }
+
+            this.geoObject.Reset(); // reset just in case of a floating point error which might cause an angle deviation which may add up over time
+        }
     }
 
     private int[] GetSolveNumbers() // gets the numbers that should be entered to solve this module.
