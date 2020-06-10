@@ -47,6 +47,8 @@ public class DimensionKingModule : MonoBehaviour
     public static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
 
     private static readonly string[] possibleShapes = "3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');//;5 3 3
+
+    [SuppressMessage("Codequality", "IDE0052", Justification = "Used in the future.")]
     private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
     public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
     public const int numberOfRotations = 5;
@@ -130,6 +132,7 @@ public class DimensionKingModule : MonoBehaviour
         this._rotationCoroutine = StartCoroutine(RotateDimKing());
     }
 
+    [SuppressMessage("Codequality", "IDE0051:Remove unused private members", Justification = "Called by Unity.")]
     void Update()
     {
         if (this.randRot != 0)
@@ -428,6 +431,8 @@ public class DimensionKingModule : MonoBehaviour
     }
 
 #pragma warning disable 414
+
+    [SuppressMessage("Codequality", "IDE0051:Remove unused private members", Justification = "Used by Twitchplays.")]
     private readonly string TwitchHelpMessage = @"!{0} go [use to begin entering the solution] | !{0} press color1 color2 color3 [clicks vertices with those colors, in that order, accepts any args, also allows only entering the first letter of the color]";
 #pragma warning restore 414
 
@@ -522,6 +527,7 @@ public class DimensionKingModule : MonoBehaviour
         yield return InteractWithKmSelectables(ProcessTwitchCommand(command));
     }
 
+    [SuppressMessage("Codequality", "IDE0051:Remove unused private members", Justification = "Used by Twitchplays.")]
     IEnumerator TwitchHandleForcedSolve()
     {
         if (this._rotationCoroutine != null)
