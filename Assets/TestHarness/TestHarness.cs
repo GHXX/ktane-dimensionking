@@ -1464,10 +1464,14 @@ public class TestHarness : MonoBehaviour
 
 				selectable.OnUpdateChildren += select => { AddHighlightables(); AddSelectables(); };
 
-				if(selectable.Highlight == null)
-					LogErrorAtTransform(selectable.transform, "KMSelectable.Highlight");
-				else
-					testSelectable.Highlight = selectable.Highlight.GetComponent<TestHighlightable>();
+                if (selectable.transform.name.Equals("Bottom Face") || selectable.transform.name.Equals("Top Face"))
+                    continue;
+                else if (selectable.Highlight == null)
+                {
+                    LogErrorAtTransform(selectable.transform, "KMSelectable.Highlight");
+                }
+                else
+                    testSelectable.Highlight = selectable.Highlight.GetComponent<TestHighlightable>();
 	        }
 	        catch (Exception ex)
 	        {
@@ -1479,7 +1483,9 @@ public class TestHarness : MonoBehaviour
         {
 			TestSelectable testSelectable = selectable.gameObject.GetComponent<TestSelectable>();
             testSelectable.Parent = selectable.Parent ? selectable.Parent.GetComponent<TestSelectable>() : null;
-            testSelectable.Children = new TestSelectable[selectable.Children.Length];
+
+			if (selectable.Children == null) continue;
+			testSelectable.Children = new TestSelectable[selectable.Children.Length];
             for (int i = 0; i < selectable.Children.Length; i++)
             {
                 if (selectable.Children[i] != null)
