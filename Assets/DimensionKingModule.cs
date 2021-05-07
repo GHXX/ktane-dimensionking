@@ -144,6 +144,11 @@ public class DimensionKingModule : MonoBehaviour
 
     private void GeoObject_OnVertexClicked(object sender, VertexPressedEventArgs e)
     {
+        if (this.moduleState == ModuleSolveState.Solved)
+        {
+            return;
+        }
+
         Log("Clicked vertex " + e.i);
 
         this.Audio.PlaySoundAtTransform("Bleep" + new[] { 3, 4, 6 }.PickRandom(), this.transform);
@@ -408,6 +413,7 @@ public class DimensionKingModule : MonoBehaviour
             new[] { checkmarkWidth, 0, 2f }, new[] { checkmarkWidth, 0,-checkmarkWidth}, new[]{ -0.7f, 0, 0.85f- checkmarkWidth }
         };
         var edgeIndices = Enumerable.Range(0, checkmarkShapeList.Count - 1).Select(x => new[] { x, x + 1 }).ToList();
+        edgeIndices.Add(new[] { 0, checkmarkShapeList.Count - 1 });
 
         var itemsToClone = checkmarkShapeList.Count;
         for (int i = 0; i < itemsToClone; i++)
@@ -420,28 +426,33 @@ public class DimensionKingModule : MonoBehaviour
             {
                 edgeIndices.Add(new[] { itemsToClone + i - 1, itemsToClone + i });
             }
+            edgeIndices.Add(new[] { i, itemsToClone + i }); // vertical connections
         }
+        edgeIndices.Add(new[] { itemsToClone, itemsToClone + itemsToClone - 1 });
 
-        var checkmarkShape = checkmarkShapeList.ToArray();
+
+
+
+        var checkmarkShape = checkmarkShapeList.Select(x => x.Concat(new float[] { 0, 0 }).ToArray()).ToArray();
 
 
         yield return this.geoObject.PhaseToNewObjectAndSetMaterialColor(checkmarkShape, edgeIndices.ToArray(), new int[][] { }, Color.green);
         this.geoObject.OriginalVertexLocations = this.geoObject.GetVertexLocations;
 
-        //this.Module.HandlePass(); // TODO uncomment
+        this.Module.HandlePass();
 
         while (this.Bomb.IsBombPresent()) // TODO check if this properly ends the subroutine when the bomb is solved / exploded.
         {
             yield return new WaitForSeconds(Rnd.Range(0.75f, 1f));
 
-            var cmrots = this.rotations.Shuffle().Take(5).ToArray();
+            var cmrots = GetRotationPermutations(5).Shuffle().Take(5).ToArray();
             var cmrotsMult = Enumerable.Range(0, cmrots.Length).Select(x => Rnd.Range(0.5f, 3f)).ToArray();
 
 
-            for (int rot = 0; rot < this.rotations.Length && !this._transitioning; rot++)
+            for (int rot = 0; rot < cmrots.Length && !this._transitioning; rot++)
             {
                 var currRotName = cmrots[rot];
-
+                Log(currRotName);
                 var axis1 = GetCurrentAxesChars().IndexOf(currRotName[0]);
                 var axis2 = GetCurrentAxesChars().IndexOf(currRotName[1]);
                 var duration = 2f * cmrotsMult[rot];
