@@ -50,7 +50,7 @@ public class DimensionKingModule : MonoBehaviour
 
     [SuppressMessage("Codequality", "IDE0052", Justification = "Used in the future.")]
     private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
-    public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
+    public static readonly string[] inUseShapes = new[] { "3 3 5" };//possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
     public const int numberOfRotations = 5;
     public static readonly string[] colorNames = "Red;Blue;Yellow;Green;Orange;Cyan;Magenta;Lime;Key;White".Split(';');
     private static readonly Color[] colorValues = "FF0000;0000FF;FFFF00;008000;FF8000;00FFFF;FF00FF;00FF00;000000;FFFFFF".Split(';')
@@ -271,13 +271,18 @@ public class DimensionKingModule : MonoBehaviour
         this.chosenColors = colorNames.ToList().Shuffle().Take(this.vertexCount)
             .OrderBy(x => Array.IndexOf(colorNames, x)).ToArray();
 
-        var vo = this.geoObject.GetVertexObjects().ToList().Shuffle().ToArray();
+        var verts = this.geoObject.GetVertexObjects().ToList();
+        var centerLoc = verts.Select(x => x.ProjectTo3D()).Aggregate((a, b) => a + b) / verts.Count;
+        var vo = verts.OrderByDescending(x => Vector3.Distance(x.ProjectTo3D(), centerLoc)).ToArray().Shuffle();
 
         for (int i = 0; i < vo.Length; i++)
         {
-            var c = i < this.chosenColors.Length ? this.chosenColors[i] : this.chosenColors.PickRandom();
+            var c = this.chosenColors[i % this.chosenColors.Length];
             vo[i].vertexTransform.GetComponent<MeshRenderer>().material.color = GetColorFromName(c);
             //Log("Assigned color " + c + " with a value of " + GetColorFromName(c).ToString());
+
+            if (i % this.chosenColors.Length == 0)
+                this.chosenColors = this.chosenColors.Shuffle();
         }
 
         this.calculatedSolveNumbers = GetSolveNumbers();
