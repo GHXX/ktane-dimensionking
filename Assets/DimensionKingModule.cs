@@ -89,7 +89,7 @@ public class DimensionKingModule : MonoBehaviour
     {
         this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
         this.randRot = Rnd.Range(0, 4) * 90; // either 0, 90, 180, 270 degrees
-        Log("Module rotation angle is " + this.randRot + (this.randRot == 0 ? "." : ". This will be fun :)"));
+        Log("Module rotation angle is " + this.randRot + (this.randRot == 0 ? "." : ". Oh no :("));
 
         this.originalVertexColor = this.BaseVertex.GetComponent<MeshRenderer>().material.color;
 
@@ -457,7 +457,6 @@ public class DimensionKingModule : MonoBehaviour
             for (int rot = 0; rot < cmrots.Length && !this._transitioning; rot++)
             {
                 var currRotName = cmrots[rot];
-                Log(currRotName);
                 var axis1 = GetCurrentAxesChars().IndexOf(currRotName[0]);
                 var axis2 = GetCurrentAxesChars().IndexOf(currRotName[1]);
                 var duration = 2f * cmrotsMult[rot];
