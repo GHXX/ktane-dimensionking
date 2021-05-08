@@ -50,7 +50,7 @@ public class DimensionKingModule : MonoBehaviour
 
     [SuppressMessage("Codequality", "IDE0052", Justification = "Used in the future.")]
     private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
-    public static readonly string[] inUseShapes = new[] { "3 3 5" };//possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
+    public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
     public const int numberOfRotations = 5;
     public static readonly string[] colorNames = "Red;Blue;Yellow;Green;Orange;Cyan;Magenta;Lime;Key;White".Split(';');
     private static readonly Color[] colorValues = "FF0000;0000FF;FFFF00;008000;FF8000;00FFFF;FF00FF;00FF00;000000;FFFFFF".Split(';')
