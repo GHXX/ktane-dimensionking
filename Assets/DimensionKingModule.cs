@@ -170,7 +170,7 @@ public class DimensionKingModule : MonoBehaviour
             var c = e.VertexObject.vertexTransform.GetComponent<MeshRenderer>().material.color;
             var pressedColor = colorNames[Array.IndexOf(colorValues, c)];
             Log("Color " + pressedColor + " was pressed.");
-            var val = Array.IndexOf(this.chosenColors, pressedColor);
+            var val = Array.IndexOf(colorNames, pressedColor);
             this.enteredNumbers.Add(val);
             var nums = this.enteredNumbers[0];
             var currentNumberSum = this.enteredNumbers.Skip(1).Sum();
