@@ -68,7 +68,7 @@ public class DimensionKingModule : MonoBehaviour
     private int GetDimensionCount() { return this.geoObject.dimensionCount; }
 
     private GeoObject geoObject;
-    private readonly MonoRandom rand = new MonoRandom();
+    private static readonly MonoRandom rand = new MonoRandom();
     private ModuleSolveState moduleState = ModuleSolveState.Rotating;
 
     private string GetCurrentAxesChars() { return _axesNames.Take(GetDimensionCount()).Join(""); }
@@ -122,7 +122,7 @@ public class DimensionKingModule : MonoBehaviour
 
         string[] rotCombinations = GetRotationPermutations(GetDimensionCount());
 
-        this.rotations = Enumerable.Range(0, numberOfRotations).Select(x => rotCombinations[this.rand.Next(rotCombinations.Length)]).ToArray();
+        this.rotations = Enumerable.Range(0, numberOfRotations).Select(x => rotCombinations[rand.Next(rotCombinations.Length)]).ToArray();
         this.vertexCount = schlafliData.VertexLocations.Length;
 
         this.geoObject.OnVertexClicked += GeoObject_OnVertexClicked;
