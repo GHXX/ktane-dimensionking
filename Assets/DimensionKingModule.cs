@@ -277,12 +277,9 @@ public class DimensionKingModule : MonoBehaviour
 
         for (int i = 0; i < vo.Length; i++)
         {
-            var c = this.chosenColors[i % this.chosenColors.Length];
+            var c = i < this.chosenColors.Length ? this.chosenColors[i] : this.chosenColors.PickRandom();
             vo[i].vertexTransform.GetComponent<MeshRenderer>().material.color = GetColorFromName(c);
             //Log("Assigned color " + c + " with a value of " + GetColorFromName(c).ToString());
-
-            if (i % this.chosenColors.Length == 0)
-                this.chosenColors = this.chosenColors.Shuffle();
         }
 
         this.calculatedSolveNumbers = GetSolveNumbers();
