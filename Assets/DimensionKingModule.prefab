@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModuleType: DimensionKingModule
-  ModuleDisplayName: DimensionKing
+  ModuleDisplayName: Dimension King
   RequiresTimerVisibility: 1
 --- !u!114 &11464240
 MonoBehaviour:
