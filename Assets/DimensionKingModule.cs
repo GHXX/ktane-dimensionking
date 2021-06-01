@@ -534,7 +534,7 @@ public class DimensionKingModule : MonoBehaviour
 
     private void Log(string text)
     {
-        Debug.Log("[DimensionKing #" + this._moduleId + "] " + text);
+        Debug.Log("[Dimension King #" + this._moduleId + "] " + text);
     }
 
 #pragma warning disable 414
