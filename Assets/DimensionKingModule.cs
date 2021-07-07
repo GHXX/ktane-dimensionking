@@ -46,11 +46,25 @@ public class DimensionKingModule : MonoBehaviour
 
     public static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
 
-    private static readonly string[] possibleShapes = "3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');//;5 3 3
+    private const int baseScore = 36;
+
+    private static readonly Dictionary<string, int> possibleShapes = //"3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');//;5 3 3
+        new Dictionary<string, int>()
+        {
+            { "3 3 3", 40},
+            { "3 3 4", 36},
+            { "3 3 5", 30},
+            { "3 4 3", 32},
+            { "4 3 3", 28},
+            { "3 3 3 3", 45},
+            { "3 3 3 4", 42},
+            { "4 3 3 3", 35},
+            //{ "5 3 3", 10},
+        };
 
     [SuppressMessage("Codequality", "IDE0052", Justification = "Used in the future.")]
     private static readonly string[] possiblePentaShapes = "3 5 5/2;5/2 5 3;5 5/2 5;5 3 5/2;5/2 3 5;5/2 5 5/2;5 5/2 3;3 5/2 5;3 3 5/2;5/2 3 3".Split(';'); // TODO they need testing
-    public static readonly string[] inUseShapes = possibleShapes/*.Concat(possiblePentaShapes)*/.ToArray();
+    public static readonly Dictionary<string, int> inUseShapes = possibleShapes/*.Concat(possiblePentaShapes)*/;
     public const int numberOfRotations = 5;
     public static readonly string[] colorNames = "Red;Blue;Yellow;Green;Orange;Cyan;Magenta;Lime;Key;White".Split(';');
     private static readonly Color[] colorValues = "FF0000;0000FF;FFFF00;008000;FF8000;00FFFF;FF00FF;00FF00;000000;FFFFFF".Split(';')
@@ -66,6 +80,20 @@ public class DimensionKingModule : MonoBehaviour
     }
 
     private int GetDimensionCount() { return this.geoObject.dimensionCount; }
+
+    private int? GetModuleScore()
+    {
+        if (inUseShapes.ContainsKey(this.schlafli))
+        {
+            return inUseShapes[this.schlafli] - baseScore;
+        }
+        else
+        {
+            Log("no score found for '" + this.schlafli + "'? Autosolving module...");
+            this.Module.HandlePass();
+            return null;
+        }
+    }
 
     private GeoObject geoObject;
     private static readonly MonoRandom rand = new MonoRandom();
@@ -93,7 +121,7 @@ public class DimensionKingModule : MonoBehaviour
 
         this.originalVertexColor = this.BaseVertex.GetComponent<MeshRenderer>().material.color;
 
-        this.schlafli = inUseShapes.PickRandom();
+        this.schlafli = inUseShapes.Keys.PickRandom();
         //this.schlafli = "4 3 3";
 
         Log("Picked the following shape: {" + this.schlafli.Replace(' ', ',') + "}");
@@ -556,6 +584,11 @@ public class DimensionKingModule : MonoBehaviour
             {
                 yield return null;
                 yield return new[] { this.BaseVertex.GetComponent<KMSelectable>() };
+
+                var score = GetModuleScore();
+                if (score.HasValue && score.Value > 0) // set dynamic tp scoring, if a score is returned
+                    yield return "awardpointsonsolve " + GetModuleScore().Value.ToString();
+
                 yield break;
             }
         }
