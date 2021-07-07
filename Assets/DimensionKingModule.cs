@@ -586,7 +586,7 @@ public class DimensionKingModule : MonoBehaviour
                 yield return new[] { this.BaseVertex.GetComponent<KMSelectable>() };
 
                 var score = GetModuleScore();
-                if (score.HasValue && score.Value > 0) // set dynamic tp scoring, if a score is returned
+                if (score.HasValue && score.Value != 0) // set dynamic tp scoring, if a score is returned
                     yield return "awardpointsonsolve " + GetModuleScore().Value.ToString();
 
                 yield break;
