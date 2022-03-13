@@ -46,7 +46,7 @@ public class DimensionKingModule : MonoBehaviour
 
     public static readonly char[] _axesNames = "XYZWVUTSRQPONMLKJIHGFEDCBA".ToCharArray();
 
-    private const int baseScore = 36;
+    private const int baseScore = 28;
 
     private static readonly Dictionary<string, int> possibleShapes = //"3 3 3;3 3 4;3 3 5;3 4 3;4 3 3;3 3 3 3;3 3 3 4;4 3 3 3".Split(';');//;5 3 3
         new Dictionary<string, int>()
