@@ -19,6 +19,7 @@ public class DimensionKingModule : MonoBehaviour
     public KMBombModule Module;
     public KMRuleSeedable RuleSeedable;
     public KMAudio Audio;
+    public Transform RotaterObject;
     public Transform DimensionKingObject;
     public Transform BaseVertex;
     public Transform BaseEdge;
@@ -40,6 +41,7 @@ public class DimensionKingModule : MonoBehaviour
 
     private Coroutine _rotationCoroutine;
     private bool _transitioning;
+    private bool _solveExecuted;
     private int solveProgress;
     private List<int> enteredNumbers;
 
@@ -165,7 +167,7 @@ public class DimensionKingModule : MonoBehaviour
     {
         if (this.randRot != 0)
         {
-            this.transform.localRotation = Quaternion.Euler(this.transform.localRotation.eulerAngles.x, this.randRot, this.transform.localRotation.eulerAngles.z);
+            this.RotaterObject.localRotation = Quaternion.Euler(this.RotaterObject.localRotation.eulerAngles.x, this.randRot, this.RotaterObject.localRotation.eulerAngles.z);
             this.randRot = 0;
         }
     }
@@ -470,6 +472,7 @@ public class DimensionKingModule : MonoBehaviour
         this.geoObject.OriginalVertexLocations = this.geoObject.GetVertexLocations;
 
         this.Module.HandlePass();
+        this._solveExecuted = true;
 
         while (this.Bomb.IsBombPresent()) // TODO check if this properly ends the subroutine when the bomb is solved / exploded.
         {
@@ -712,5 +715,7 @@ public class DimensionKingModule : MonoBehaviour
             yield return null;
             yield return ProperTPCommand("press " + colorsToPress.Join(" "));
         }
+
+        while (!this._solveExecuted) yield return true;
     }
 }
