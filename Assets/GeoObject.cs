@@ -62,7 +62,7 @@ namespace DimensionKing
                 this.FaceObjects[i].vertexObjects = newFaceVertexIds[i].Select(x => this.VertexLocations[x]).ToArray();
             }
 
-            var dk = this.VertexLocations[0].vertexTransform.parent.parent;
+            var dk = this.VertexLocations[0].vertexTransform.parent.parent.parent;
             var kmsel = dk.GetComponent<KMSelectable>();
 
             var arr = new KMSelectable[this.VertexLocations.Count];
