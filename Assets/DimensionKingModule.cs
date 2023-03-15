@@ -118,7 +118,8 @@ public class DimensionKingModule : MonoBehaviour
     void Start()
     {
         this._moduleId = Interlocked.Increment(ref _moduleIdCounter);
-        this.randRot = Rnd.Range(0, 4) * 90; // either 0, 90, 180, 270 degrees
+        var nonZeroModuleRotationAngleProbability = 0.25f;
+        this.randRot = Rnd.Range(0f,1f) < nonZeroModuleRotationAngleProbability ? Rnd.Range(1, 4) * 90 : 0; // either 0, 90, 180, 270 degrees
         Log("Module rotation angle is " + this.randRot + (this.randRot == 0 ? "." : ". Oh no :("));
 
         this.originalVertexColor = this.BaseVertex.GetComponent<MeshRenderer>().material.color;
