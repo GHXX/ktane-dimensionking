@@ -156,7 +156,7 @@ public class DimensionKingModule : MonoBehaviour
         this.rotations = Enumerable.Range(0, numberOfRotations).Select(x => rotCombinations[rand.Next(rotCombinations.Length)]).ToArray();
         this.vertexCount = schlafliData.VertexLocations.Length;
 
-        this.geoObject.OnVertexClicked += GeoObject_OnVertexClicked;
+        this.geoObject.OnVertexClicked += (sender, e) => OnDkVertexClicked(sender, e);
 
         Log("Rotations are: " + string.Join(", ", this.rotations));
 
@@ -173,12 +173,10 @@ public class DimensionKingModule : MonoBehaviour
         }
     }
 
-    private void GeoObject_OnVertexClicked(object sender, VertexPressedEventArgs e)
+    private VertexClickResult OnDkVertexClicked(object sender, VertexPressedEventArgs e)
     {
         if (this.moduleState == ModuleSolveState.Solved)
-        {
-            return;
-        }
+            return VertexClickResult.None;
 
         Log("Clicked vertex " + e.i);
 
@@ -195,6 +193,7 @@ public class DimensionKingModule : MonoBehaviour
             this.moduleState = ModuleSolveState.PreSolving;
             StartCoroutine(RotatingToPreSolve());
             this.enteredNumbers = new List<int>();
+            return VertexClickResult.None;
         }
         else if (this.moduleState == ModuleSolveState.Solving)
         {
@@ -221,11 +220,13 @@ public class DimensionKingModule : MonoBehaviour
                         StartCoroutine(SolvedAnimation());
                     }
                     this.enteredNumbers.Clear();
+                    return VertexClickResult.WillSolve;
                 }
                 else
                 {
                     Log("Invalid number entered!");
                     StrikeAndReset();
+                    return VertexClickResult.WillStrike;
                 }
             }
             else if (currentNumberSum > this.calculatedSolveNumbers[this.solveProgress])
@@ -233,6 +234,7 @@ public class DimensionKingModule : MonoBehaviour
                 Log("The sum of the entered numbers " + this.enteredNumbers[0] + ", [" + this.enteredNumbers.Skip(1).Join(" ") + "] is " +
                     currentNumberSum + " which is bigger than the correct number " + this.calculatedSolveNumbers[this.solveProgress] + " already, meaning that it cannot be solved anymore.\n");
                 StrikeAndReset();
+                return VertexClickResult.WillStrike;
             }
             else if (currentNumberSum // if currently entered number sum + (numbers left to enter)*maxNumberValue, so the currently maximum enterable number ...
                 + (this.enteredNumbers[0] - (this.enteredNumbers.Count - 1)) * (this.chosenColors.Length - 1)
@@ -242,35 +244,10 @@ public class DimensionKingModule : MonoBehaviour
                     "If you add " + ((this.enteredNumbers[0] - (this.enteredNumbers.Count - 1)) * (this.chosenColors.Length - 1)) + ", which is what you could enter at most, " +
                     "then the resulting value is smaller than " + this.calculatedSolveNumbers[this.solveProgress] + ", meaning that it cannot be solved anymore.\n");
                 StrikeAndReset();
+                return VertexClickResult.WillStrike;
             }
         }
-
-        //if (this._rotationCoroutine != null)
-        //{
-        //    _progress = 0;
-        //    StartCoroutine(ColorChange(setVertexColors: true));
-        //}
-        //else if (v == _correctVertex)
-        //{
-        //    _progress++;
-        //    if (_progress == 4)
-        //    {
-        //        Debug.LogFormat(@"[The Hypercube #{0}] Module solved.", this._moduleId);
-        //        this.Module.HandlePass();
-        //        StartCoroutine(ColorChange(keepGrey: true));
-        //        this.Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, this.transform);
-        //    }
-        //    else
-        //    {
-        //        StartCoroutine(ColorChange(setVertexColors: true));
-        //    }
-        //}
-        //else
-        //{
-        //    Debug.LogFormat(@"[The Hypercube #{0}] Incorrect vertex {1} pressed; resuming rotations.", this._moduleId, StringifyShape(v));
-        //    this.Module.HandleStrike();
-        //    this._rotationCoroutine = StartCoroutine(RotateHypercube(delay: true));
-        //}
+        return VertexClickResult.None;
     }
 
     private void StrikeAndReset()
@@ -633,13 +610,33 @@ public class DimensionKingModule : MonoBehaviour
                 var vertexCopy = this.geoObject.GetVertexObjects();
                 var KmSelByChar = this.chosenColors.ToDictionary(x =>
                     x.ToLowerInvariant()[0],
-                    x => vertexCopy.First(y => y.GetTransform().GetComponent<MeshRenderer>().material.color == GetColorFromName(x)).GetKMSelectable()
+                    x => vertexCopy.First(y => y.GetTransform().GetComponent<MeshRenderer>().material.color == GetColorFromName(x))
                 );
 
                 var verticesToClick = parsedColors.Select(x => KmSelByChar[x.ToLowerInvariant()[0]]).ToArray();
 
                 yield return null;
                 yield return verticesToClick;
+
+                foreach (var toClick in verticesToClick) {
+                    var idx = vertexCopy.IndexOf(toClick);
+                    if (idx <= -1)
+                        throw new Exception("somehow idx wasnt found???");
+
+                    var clickResult = OnDkVertexClicked(geoObject, new VertexPressedEventArgs(toClick, idx));
+                    switch (clickResult) {
+                        case VertexClickResult.None:
+                            break;
+                        case VertexClickResult.WillStrike:
+                            Log("Awarding TP strike");
+                            yield return "strike";
+                            break;
+                        case VertexClickResult.WillSolve:
+                            Log("Awarding TP solve");
+                            yield return "solve";
+                            break;
+                    }
+                }
             }
         }
     }
