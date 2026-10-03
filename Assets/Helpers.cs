@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
 
-namespace DimensionKing
-{
-    static class Helpers
-    {
-        internal static float GetRotationProgress(float percentage, float steepness)
-        {
+namespace DimensionKing {
+    internal static class Helpers {
+        internal static float GetRotationProgress(float percentage, float steepness) {
             if (percentage <= 0)
                 return 0;
 

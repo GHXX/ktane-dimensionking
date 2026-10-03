@@ -5,26 +5,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
-namespace DimensionKing
-{
-    internal class GeoObject : ScriptableObject
-    {
+namespace DimensionKing {
+    internal class GeoObject : ScriptableObject {
         private List<VertexObject> VertexLocations;
 
         internal event EventHandler<VertexPressedEventArgs> OnVertexClicked;
 
         internal VecNd[] OriginalVertexLocations;
-        internal VecNd[] GetVertexLocations { get { return this.VertexLocations.Select(x => x.position).ToArray(); } }
-        internal void SetVertexLocations(VecNd[] newLocations)
-        {
-            if (newLocations.Length != this.VertexLocations.Count)
-            {
+        internal VecNd[] GetVertexLocations { get { return VertexLocations.Select(x => x.position).ToArray(); } }
+        internal void SetVertexLocations(VecNd[] newLocations) {
+            if (newLocations.Length != VertexLocations.Count) {
                 throw new ArgumentException("The length of the passed vertice array is not equal to the expected length!");
             }
 
-            for (int i = 0; i < newLocations.Length; i++)
-            {
-                this.VertexLocations[i].position = newLocations[i];
+            for (int i = 0; i < newLocations.Length; i++) {
+                VertexLocations[i].position = newLocations[i];
             }
 
             RecalculateMeshes();
@@ -38,39 +33,34 @@ namespace DimensionKing
 
         public GeoObject() { }
 
-        public void LoadVerticesEdgesAndFaces(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds)
-        {
-            this.dimensionCount = newVertexPositions[0].Length;
+        public void LoadVerticesEdgesAndFaces(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds) {
+            dimensionCount = newVertexPositions[0].Length;
 
-            DestroyExessAndCreateRequired(this.VertexLocations, newVertexPositions.Length);
-            for (int i = 0; i < newVertexPositions.Length; i++)
-            {
-                this.VertexLocations[i].position = new VecNd(newVertexPositions[i].Select(x => (double)x).ToArray());
+            DestroyExessAndCreateRequired(VertexLocations, newVertexPositions.Length);
+            for (int i = 0; i < newVertexPositions.Length; i++) {
+                VertexLocations[i].position = new VecNd(newVertexPositions[i].Select(x => (double)x).ToArray());
             }
 
-            this.OriginalVertexLocations = this.VertexLocations.Select(x => x.position).ToArray();
+            OriginalVertexLocations = VertexLocations.Select(x => x.position).ToArray();
 
-            DestroyExessAndCreateRequired(this.EdgeObjects, newEdgeVertexIds.Length);
-            for (int i = 0; i < newEdgeVertexIds.Length; i++)
-            {
-                this.EdgeObjects[i].vertexObjects = newEdgeVertexIds[i].Select(x => this.VertexLocations[x]).ToArray();
+            DestroyExessAndCreateRequired(EdgeObjects, newEdgeVertexIds.Length);
+            for (int i = 0; i < newEdgeVertexIds.Length; i++) {
+                EdgeObjects[i].vertexObjects = newEdgeVertexIds[i].Select(x => VertexLocations[x]).ToArray();
             }
 
-            DestroyExessAndCreateRequired(this.FaceObjects, newFaceVertexIds.Length);
-            for (int i = 0; i < newFaceVertexIds.Length; i++)
-            {
-                this.FaceObjects[i].vertexObjects = newFaceVertexIds[i].Select(x => this.VertexLocations[x]).ToArray();
+            DestroyExessAndCreateRequired(FaceObjects, newFaceVertexIds.Length);
+            for (int i = 0; i < newFaceVertexIds.Length; i++) {
+                FaceObjects[i].vertexObjects = newFaceVertexIds[i].Select(x => VertexLocations[x]).ToArray();
             }
 
-            var dk = this.VertexLocations[0].vertexTransform.parent.parent.parent;
+            var dk = VertexLocations[0].vertexTransform.parent.parent.parent;
             var kmsel = dk.GetComponent<KMSelectable>();
 
-            var arr = new KMSelectable[this.VertexLocations.Count];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>();
+            var arr = new KMSelectable[VertexLocations.Count];
+            for (int i = 0; i < arr.Length; i++) {
+                arr[i] = VertexLocations[i].vertexTransform.GetComponent<KMSelectable>();
                 //arr[i].Highlight = arr[0].Highlight;
-                this.VertexLocations[i].vertexTransform.GetComponent<KMSelectable>().OnInteract = OnVertexClickedInternal(this.VertexLocations[i], i);
+                VertexLocations[i].vertexTransform.GetComponent<KMSelectable>().OnInteract = OnVertexClickedInternal(VertexLocations[i], i);
             }
             kmsel.ChildRowLength = arr.Length;
             kmsel.Children = arr;
@@ -79,37 +69,34 @@ namespace DimensionKing
             RecalculateMeshes();
         }
 
-        internal void SetBaseObjects(Transform baseVertex, Transform baseEdge, Transform baseFace)
-        {
-            this.VertexLocations = new List<VertexObject>() { new VertexObject(new VecNd()) { vertexTransform = baseVertex } };
-            this.EdgeObjects = new List<EdgeObject>() {
-                new EdgeObject(new[] { this.VertexLocations[0], this.VertexLocations[0] })
+        internal void SetBaseObjects(Transform baseVertex, Transform baseEdge, Transform baseFace) {
+            VertexLocations = new List<VertexObject>() { new VertexObject(new VecNd()) { vertexTransform = baseVertex } };
+            EdgeObjects = new List<EdgeObject>() {
+                new EdgeObject(new[] { VertexLocations[0], VertexLocations[0] })
                 {
                     edgeMesh = baseEdge.GetComponent<MeshFilter>(), edgeTransform = baseEdge
                 }
             };
 
-            this.FaceObjects = new List<FaceObject>() {
-                new FaceObject(new[] { this.VertexLocations[0], this.VertexLocations[0], this.VertexLocations[0], this.VertexLocations[0] })
+            FaceObjects = new List<FaceObject>() {
+                new FaceObject(new[] { VertexLocations[0], VertexLocations[0], VertexLocations[0], VertexLocations[0] })
                 {
                     faceMesh = baseFace.GetComponent<MeshFilter>(), faceTransform = baseFace
                 }
             };
         }
 
-        internal IEnumerator PhaseToNewObjectAndSetMaterialColor(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds, Color newVertexColor)
-        {
+        internal IEnumerator PhaseToNewObjectAndSetMaterialColor(float[][] newVertexPositions, int[][] newEdgeVertexIds, int[][] newFaceVertexIds, Color newVertexColor) {
             var returnDurationA = 2f;
             var returnElapsedA = 0f;
 
-            var currVertPositions = this.GetVertexLocations;
+            var currVertPositions = GetVertexLocations;
 
             var zeroVecNd = new VecNd(new double[currVertPositions[0].Components.Length]);
             var newVertPositionsA = Enumerable.Range(0, currVertPositions.Length).Select(x => zeroVecNd).ToArray();
 
 
-            while (returnElapsedA < returnDurationA)
-            {
+            while (returnElapsedA < returnDurationA) {
                 float currDistance = Helpers.GetRotationProgress(returnElapsedA / returnDurationA, 3);
 
                 var newPos = Enumerable.Range(0, currVertPositions.Length)
@@ -125,9 +112,8 @@ namespace DimensionKing
 
             LoadVerticesEdgesAndFaces(newVertexPositions.Select(x => new float[x.Length]).ToArray(), newEdgeVertexIds, newFaceVertexIds);
 
-            IList<VertexObject> verts = this.GetVertexObjects();
-            for (int i = 0; i < verts.Count; i++)
-            {
+            IList<VertexObject> verts = GetVertexObjects();
+            for (int i = 0; i < verts.Count; i++) {
                 verts[i].GetTransform().GetComponent<MeshRenderer>().material.color = newVertexColor;
             }
 
@@ -140,8 +126,7 @@ namespace DimensionKing
             var zeroVecNdB = new VecNd(new double[newVecNdVertexPositionsB[0].Components.Length]);
             var oldVertPositionsB = Enumerable.Range(0, newVecNdVertexPositionsB.Length).Select(x => zeroVecNdB).ToArray();
 
-            while (returnElapsedB < returnDurationB)
-            {
+            while (returnElapsedB < returnDurationB) {
                 float currDistance = Helpers.GetRotationProgress(returnElapsedB / returnDurationB, 3);
 
                 var newPos = Enumerable.Range(0, oldVertPositionsB.Length)
@@ -157,28 +142,24 @@ namespace DimensionKing
         }
 
 
-        private void RecalculateMeshes()
-        {
-            var min = this.VertexLocations[0].UpdatePosition();
+        private void RecalculateMeshes() {
+            var min = VertexLocations[0].UpdatePosition();
             var max = min;
 
-            for (int i = 0; i < this.VertexLocations.Count; i++)
-            {
-                var newPos = this.VertexLocations[i].UpdatePosition();
+            for (int i = 0; i < VertexLocations.Count; i++) {
+                var newPos = VertexLocations[i].UpdatePosition();
                 min = Vector3.Min(newPos, min);
                 max = Vector3.Max(newPos, max);
             }
 
             //this.VertexLocations[0].GetTransform().parent.localPosition = (min + max) / 2;
 
-            for (int i = 0; i < this.EdgeObjects.Count; i++)
-            {
-                this.EdgeObjects[i].RecalculateMesh();
+            for (int i = 0; i < EdgeObjects.Count; i++) {
+                EdgeObjects[i].RecalculateMesh();
             }
 
-            for (int i = 0; i < this.FaceObjects.Count; i++)
-            {
-                this.FaceObjects[i].RecalculateMesh(); // TODO could optimize by only recalculating normals for changed meshes
+            for (int i = 0; i < FaceObjects.Count; i++) {
+                FaceObjects[i].RecalculateMesh(); // TODO could optimize by only recalculating normals for changed meshes
             }
         }
 
@@ -188,59 +169,47 @@ namespace DimensionKing
         /// <param name="axisIndexA"></param>
         /// <param name="axisIndexB"></param>
         /// <param name="angle">How much to rotate it by.</param>
-        public void Rotate(int axisIndexA, int axisIndexB, float angle)
-        {
-            var matrix = new double[this.dimensionCount * this.dimensionCount];
-            for (int i = 0; i < this.dimensionCount; i++)
-                for (int j = 0; j < this.dimensionCount; j++)
-                    matrix[i + this.dimensionCount * j] =
+        public void Rotate(int axisIndexA, int axisIndexB, float angle) {
+            var matrix = new double[dimensionCount * dimensionCount];
+            for (int i = 0; i < dimensionCount; i++)
+                for (int j = 0; j < dimensionCount; j++)
+                    matrix[i + dimensionCount * j] =
                         i == axisIndexA && j == axisIndexA ? Mathf.Cos(angle) :
                         i == axisIndexA && j == axisIndexB ? Mathf.Sin(angle) :
                         i == axisIndexB && j == axisIndexA ? -Mathf.Sin(angle) :
                         i == axisIndexB && j == axisIndexB ? Mathf.Cos(angle) :
                         i == j ? 1 : 0;
 
-            for (int i = 0; i < this.VertexLocations.Count; i++)
-            {
-                this.VertexLocations[i].position *= matrix;
+            for (int i = 0; i < VertexLocations.Count; i++) {
+                VertexLocations[i].position *= matrix;
             }
             RecalculateMeshes();
         }
 
-        internal ReadOnlyCollection<VertexObject> GetVertexObjects()
-        {
-            return this.VertexLocations.AsReadOnly();
+        internal ReadOnlyCollection<VertexObject> GetVertexObjects() {
+            return VertexLocations.AsReadOnly();
         }
 
-        private void DestroyExessAndCreateRequired<T>(List<T> collection, int newCount) where T : IDestroyable<T>
-        {
+        private void DestroyExessAndCreateRequired<T>(List<T> collection, int newCount) where T : IDestroyable<T> {
             if (newCount < collection.Count) // if the new array shield have less items than the previous then destroy the excess ones
             {
                 int delCount = collection.Count - newCount;
 
-                for (int i = 0; i < delCount; i++)
-                {
-                    if (collection.Count - 1 == 0)
-                    {
+                for (int i = 0; i < delCount; i++) {
+                    if (collection.Count - 1 == 0) {
                         collection[0].GetTransform().GetComponent<MeshRenderer>().enabled = false; // if its the last one, disable it instead of deleting it
-                    }
-                    else
-                    {
+                    } else {
                         collection[collection.Count - 1].Destroy();
                         collection.RemoveAt(collection.Count - 1);
                     }
                 }
-            }
-            else if (newCount > collection.Count)
-            {
-                if (collection.Count == 1)
-                {
+            } else if (newCount > collection.Count) {
+                if (collection.Count == 1) {
                     collection[0].GetTransform().GetComponent<MeshRenderer>().enabled = true; // reenable the previously disabled meshrenderer
                 }
 
                 int addCount = newCount - collection.Count;
-                for (int i = 0; i < addCount; i++)
-                {
+                for (int i = 0; i < addCount; i++) {
                     var baseTransform = collection[0].GetTransform();
 
                     var clone = collection[0].CreateNewInstance();
@@ -258,185 +227,153 @@ namespace DimensionKing
             }
         }
 
-        internal class VertexObject : IDestroyable<VertexObject>
-        {
+        internal class VertexObject : IDestroyable<VertexObject> {
             internal VecNd position;
             internal Transform vertexTransform;
 
-            internal Vector3 ProjectTo3D()
-            {
-                return this.position.Project();
+            internal Vector3 ProjectTo3D() {
+                return position.Project();
             }
 
-            public VertexObject(VecNd position)
-            {
+            public VertexObject(VecNd position) {
                 this.position = position;
             }
 
-            private VertexObject(Transform t)
-            {
-                this.vertexTransform = t;
+            private VertexObject(Transform t) {
+                vertexTransform = t;
             }
 
-            void IDestroyable<VertexObject>.Destroy()
-            {
-                Destroy(this.vertexTransform.gameObject);
+            void IDestroyable<VertexObject>.Destroy() {
+                Destroy(vertexTransform.gameObject);
             }
 
-            VertexObject IDestroyable<VertexObject>.CreateNewInstance()
-            {
-                return new VertexObject(Instantiate(this.vertexTransform));
+            VertexObject IDestroyable<VertexObject>.CreateNewInstance() {
+                return new VertexObject(Instantiate(vertexTransform));
             }
 
-            public Transform GetTransform()
-            {
-                return this.vertexTransform;
+            public Transform GetTransform() {
+                return vertexTransform;
             }
 
-            internal Vector3 UpdatePosition()
-            {
+            internal Vector3 UpdatePosition() {
                 var pos = ProjectTo3D();
-                this.vertexTransform.localPosition = pos;
+                vertexTransform.localPosition = pos;
 
                 return pos;
             }
 
-            internal KMSelectable GetKMSelectable()
-            {
-                return this.vertexTransform.GetComponent<KMSelectable>();
+            internal KMSelectable GetKMSelectable() {
+                return vertexTransform.GetComponent<KMSelectable>();
             }
         }
 
-        private KMSelectable.OnInteractHandler OnVertexClickedInternal(VertexObject vertex, int i)
-        {
-            return delegate
-            {
-                if (this.OnVertexClicked != null)
-                {
+        private KMSelectable.OnInteractHandler OnVertexClickedInternal(VertexObject vertex, int i) {
+            return delegate {
+                if (OnVertexClicked != null) {
                     OnVertexClicked.Invoke(this, new VertexPressedEventArgs(vertex, i));
                 }
                 return false;
             };
         }
 
-        internal class EdgeObject : IDestroyable<EdgeObject>
-        {
+        internal class EdgeObject : IDestroyable<EdgeObject> {
             internal VertexObject[] vertexObjects;
             internal Transform edgeTransform;
             internal MeshFilter edgeMesh;
 
-            public EdgeObject(VertexObject[] vertexObjects)
-            {
-                if (vertexObjects.Length != 2)
-                {
+            public EdgeObject(VertexObject[] vertexObjects) {
+                if (vertexObjects.Length != 2) {
                     throw new ArgumentException("Every edge has to have two vertices!");
                 }
 
                 this.vertexObjects = vertexObjects;
             }
 
-            private EdgeObject(MeshFilter mesh, Transform t)
-            {
-                this.edgeMesh = mesh;
-                this.edgeTransform = t;
+            private EdgeObject(MeshFilter mesh, Transform t) {
+                edgeMesh = mesh;
+                edgeTransform = t;
             }
 
-            void IDestroyable<EdgeObject>.Destroy()
-            {
-                Destroy(this.edgeMesh.gameObject);
+            void IDestroyable<EdgeObject>.Destroy() {
+                Destroy(edgeMesh.gameObject);
             }
 
-            EdgeObject IDestroyable<EdgeObject>.CreateNewInstance()
-            {
-                var t = Instantiate(this.edgeTransform);
+            EdgeObject IDestroyable<EdgeObject>.CreateNewInstance() {
+                var t = Instantiate(edgeTransform);
                 return new EdgeObject(t.GetComponent<MeshFilter>(), t);
             }
 
-            internal Vector3[] GetEdgeVertexPositions()
-            {
+            internal Vector3[] GetEdgeVertexPositions() {
                 var retval = new Vector3[2];
 
-                for (int i = 0; i < 2; i++)
-                {
-                    retval[i] = this.vertexObjects[i].ProjectTo3D();
+                for (int i = 0; i < 2; i++) {
+                    retval[i] = vertexObjects[i].ProjectTo3D();
                 }
 
                 return retval;
             }
 
-            internal void RecalculateMesh()
-            {
-                var pos1 = this.vertexObjects[0].ProjectTo3D();
-                var pos2 = this.vertexObjects[1].ProjectTo3D();
+            internal void RecalculateMesh() {
+                var pos1 = vertexObjects[0].ProjectTo3D();
+                var pos2 = vertexObjects[1].ProjectTo3D();
 
                 var deltaVector = pos2 - pos1;
                 var deltaVectorNormalized = deltaVector.normalized;
-                this.edgeMesh.transform.localPosition = (pos1 + pos2) / 2;
-                this.edgeMesh.transform.localScale = new Vector3(0.1f, deltaVector.magnitude / 2f, 0.1f);
+                edgeMesh.transform.localPosition = (pos1 + pos2) / 2;
+                edgeMesh.transform.localScale = new Vector3(0.1f, deltaVector.magnitude / 2f, 0.1f);
 
-                this.edgeMesh.transform.localRotation = Quaternion.FromToRotation(Vector3.up, pos2 - pos1);
+                edgeMesh.transform.localRotation = Quaternion.FromToRotation(Vector3.up, pos2 - pos1);
             }
-            public Transform GetTransform()
-            {
-                return this.edgeTransform;
+            public Transform GetTransform() {
+                return edgeTransform;
             }
         }
 
-        internal class FaceObject : IDestroyable<FaceObject>
-        {
+        internal class FaceObject : IDestroyable<FaceObject> {
             internal VertexObject[] vertexObjects;
             internal MeshFilter faceMesh;
             internal Transform faceTransform;
 
-            public FaceObject(VertexObject[] vertexObjects)
-            {
-                if (vertexObjects.Length < 3)
-                {
+            public FaceObject(VertexObject[] vertexObjects) {
+                if (vertexObjects.Length < 3) {
                     throw new ArgumentException("Every face has to have at least 3 vertices!");
                 }
 
                 this.vertexObjects = vertexObjects;
             }
 
-            private FaceObject(MeshFilter mesh, Transform t)
-            {
-                this.faceMesh = mesh;
-                this.faceTransform = t;
+            private FaceObject(MeshFilter mesh, Transform t) {
+                faceMesh = mesh;
+                faceTransform = t;
             }
 
-            void IDestroyable<FaceObject>.Destroy()
-            {
-                Destroy(this.faceMesh.gameObject);
+            void IDestroyable<FaceObject>.Destroy() {
+                Destroy(faceMesh.gameObject);
             }
 
-            FaceObject IDestroyable<FaceObject>.CreateNewInstance()
-            {
-                var t = Instantiate(this.faceTransform);
+            FaceObject IDestroyable<FaceObject>.CreateNewInstance() {
+                var t = Instantiate(faceTransform);
                 return new FaceObject(t.GetComponent<MeshFilter>(), t);
             }
 
-            internal Vector3[] GetFaceVertexPositions()
-            {
-                var retval = new Vector3[this.vertexObjects.Length];
+            internal Vector3[] GetFaceVertexPositions() {
+                var retval = new Vector3[vertexObjects.Length];
 
-                for (int i = 0; i < this.vertexObjects.Length; i++)
-                {
-                    retval[i] = this.vertexObjects[i].ProjectTo3D();
+                for (int i = 0; i < vertexObjects.Length; i++) {
+                    retval[i] = vertexObjects[i].ProjectTo3D();
                 }
 
                 return retval;
             }
 
-            internal void RecalculateMesh()
-            {
-                this.faceMesh.mesh.Clear();
+            internal void RecalculateMesh() {
+                faceMesh.mesh.Clear();
                 var vertices = GetFaceVertexPositions();
-                this.faceMesh.mesh.vertices = vertices;
+                faceMesh.mesh.vertices = vertices;
 
                 int[] triangleIndices;
 
-                switch (vertices.Length)
-                {
+                switch (vertices.Length) {
                     case 3: triangleIndices = new[] { 0, 1, 2 }; break;
                     case 4:
                         triangleIndices = new[] {
@@ -459,28 +396,25 @@ namespace DimensionKing
                     default: throw new NotImplementedException();
                 }
 
-                this.faceMesh.mesh.triangles = triangleIndices;
-                this.faceMesh.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                faceMesh.mesh.triangles = triangleIndices;
+                faceMesh.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
-                this.faceMesh.mesh.RecalculateNormals();
+                faceMesh.mesh.RecalculateNormals();
             }
-            public Transform GetTransform()
-            {
-                return this.faceTransform;
+            public Transform GetTransform() {
+                return faceTransform;
             }
         }
 
-        internal interface IDestroyable<T>
-        {
+        internal interface IDestroyable<T> {
             void Destroy();
             T CreateNewInstance();
 
             Transform GetTransform();
         }
 
-        internal void Reset()
-        {
-            SetVertexLocations(this.OriginalVertexLocations);
+        internal void Reset() {
+            SetVertexLocations(OriginalVertexLocations);
         }
     }
 }

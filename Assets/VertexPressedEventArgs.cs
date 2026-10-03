@@ -1,12 +1,9 @@
 ﻿using System;
 
-namespace DimensionKing
-{
-    class VertexPressedEventArgs : EventArgs
-    {
-        public VertexPressedEventArgs(GeoObject.VertexObject vertexObject, int i)
-        {
-            this.VertexObject = vertexObject;
+namespace DimensionKing {
+    internal class VertexPressedEventArgs : EventArgs {
+        public VertexPressedEventArgs(GeoObject.VertexObject vertexObject, int i) {
+            VertexObject = vertexObject;
             this.i = i;
         }
 

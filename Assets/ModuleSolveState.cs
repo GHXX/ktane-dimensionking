@@ -1,5 +1,4 @@
-﻿internal enum ModuleSolveState
-{
+﻿internal enum ModuleSolveState {
     Rotating,
     PreSolving,
     Solving,
